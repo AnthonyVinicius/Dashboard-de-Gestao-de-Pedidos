@@ -1,3 +1,7 @@
-package com.claro.pedidos.entity;
+package com.claro.ordermanager.entity;
 
-public enum StatusPedido {EM_PROCESSAMENTO,PAUSADO,CANCELADO}
+public enum OrderStatus {
+    PROCESSING,
+    PAUSED,
+    CANCELED
+}

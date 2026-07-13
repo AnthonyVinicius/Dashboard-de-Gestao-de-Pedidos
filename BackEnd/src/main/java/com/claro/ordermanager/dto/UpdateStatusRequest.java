@@ -1,11 +1,11 @@
-package com.claro.pedidos.dto;
+package com.claro.ordermanager.dto;
 
-import com.claro.pedidos.entity.StatusPedido;
+import com.claro.ordermanager.entity.OrderStatus;
 import jakarta.validation.constraints.NotNull;
 
-public record AtualizarStatusRequest(
+public record UpdateStatusRequest(
 
-        @NotNull(message = "O novo status é obrigatório")
-        StatusPedido status
+        @NotNull(message = "New status is required")
+        OrderStatus status
 ) {
 }

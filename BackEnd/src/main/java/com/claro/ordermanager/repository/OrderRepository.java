@@ -1,11 +1,11 @@
-package com.claro.pedidos.repository;
+package com.claro.ordermanager.repository;
 
-import com.claro.pedidos.entity.Pedido;
+import com.claro.ordermanager.entity.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
 @Repository
-public interface PedidoRepository extends JpaRepository <Pedido, UUID> {
+public interface OrderRepository extends JpaRepository <Order, UUID> {
 }

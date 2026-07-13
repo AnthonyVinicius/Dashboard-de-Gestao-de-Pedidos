@@ -1,13 +1,13 @@
-package com.claro.pedidos;
+package com.claro.ordermanager;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class PedidosApplication {
+public class OrderApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(PedidosApplication.class, args);
+		SpringApplication.run(OrderApplication.class, args);
 	}
 
 }

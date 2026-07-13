@@ -1,4 +1,4 @@
-package com.claro.pedidos.entity;
+package com.claro.ordermanager.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,12 +9,12 @@ import lombok.Setter;
 import java.util.UUID;
 
 @Entity
-@Table(name = "pedidos")
+@Table(name = "orders")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Pedido {
+public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -24,12 +24,12 @@ public class Pedido {
     private String displayName;
 
     @Column(nullable = false)
-    private Integer itens;
+    private Integer items;
 
     @Column(nullable = false)
-    private Integer peso;
+    private Integer weight;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private StatusPedido status;
+    private OrderStatus status;
 }
