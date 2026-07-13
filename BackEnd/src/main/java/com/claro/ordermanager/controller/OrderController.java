@@ -2,7 +2,7 @@ package com.claro.pedidos.controller;
 
 import com.claro.pedidos.dto.PedidoRequest;
 import com.claro.pedidos.dto.PedidoResponse;
-import com.claro.pedidos.service.PedidoService;
+import com.claro.pedidos.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,12 +17,12 @@ import java.util.UUID;
 @RequestMapping("/api/pedidos")
 public class PedidoController {
 
-    private final PedidoService pedidoService;
+    private final OrderService orderService;
 
     @GetMapping
     public ResponseEntity<List<PedidoResponse>> getAllPedidos() {
         return ResponseEntity.ok(
-                pedidoService.getAllPedidos()
+                orderService.getAllPedidos()
         );
     }
 
@@ -31,7 +31,7 @@ public class PedidoController {
             @PathVariable UUID uuid
     ) {
         return ResponseEntity.ok(
-                pedidoService.getPedidoById(uuid)
+                orderService.getPedidoById(uuid)
         );
     }
 
@@ -40,7 +40,7 @@ public class PedidoController {
             @Valid @RequestBody PedidoRequest request
     ) {
         PedidoResponse pedidoCriado =
-                pedidoService.createPedido(request);
+                orderService.createPedido(request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -51,7 +51,7 @@ public class PedidoController {
     public ResponseEntity<Void> deletePedido(
             @PathVariable UUID uuid
     ) {
-        pedidoService.deletePedido(uuid);
+        orderService.deletePedido(uuid);
 
         return ResponseEntity.noContent().build();
     }
