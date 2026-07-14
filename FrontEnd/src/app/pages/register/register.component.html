@@ -1,0 +1,32 @@
+<div class="card">
+  <h2>Register</h2>
+
+  <form>
+    <label>Name</label>
+    <input
+      type="text"
+      placeholder="Your full name"
+    />
+
+    <label>Email</label>
+    <input
+      type="email"
+      placeholder="your@email.com"
+    />
+
+    <label>Password</label>
+    <input
+      type="password"
+      placeholder="******"
+    />
+
+    <app-button type="submit" [fullWidth]="true">
+      Register
+    </app-button>
+  </form>
+
+  <p class="hint">
+    Already have an account?
+    <a routerLink="/login">Login</a>
+  </p>
+</div>
