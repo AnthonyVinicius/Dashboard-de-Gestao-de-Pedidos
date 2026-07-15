@@ -1,7 +1,8 @@
 package com.claro.ordermanager.controller;
 
-import com.claro.ordermanager.dto.OrderRequest;
-import com.claro.ordermanager.dto.OrderResponse;
+import com.claro.ordermanager.dto.OrderRequestDTO;
+import com.claro.ordermanager.dto.OrderResponseDTO;
+import com.claro.ordermanager.dto.UpdateOrderStatusRequestDTO;
 import com.claro.ordermanager.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,14 +21,14 @@ public class OrderController {
     private final OrderService orderService;
 
     @GetMapping
-    public ResponseEntity<List<OrderResponse>> getAllOrders() {
+    public ResponseEntity<List<OrderResponseDTO>> getAllOrders() {
         return ResponseEntity.ok(
                 orderService.getAllOrders()
         );
     }
 
     @GetMapping("/{uuid}")
-    public ResponseEntity<OrderResponse> getOrderById(
+    public ResponseEntity<OrderResponseDTO> getOrderById(
             @PathVariable UUID uuid
     ) {
         return ResponseEntity.ok(
@@ -36,15 +37,26 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<OrderResponse> createOrder(
-            @Valid @RequestBody OrderRequest request
+    public ResponseEntity<OrderResponseDTO> createOrder(
+            @Valid @RequestBody OrderRequestDTO request
     ) {
-        OrderResponse createdOrder =
+        OrderResponseDTO createdOrder =
                 orderService.createOrder(request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(createdOrder);
+    }
+
+    @PatchMapping("/{uuid}/status")
+    public ResponseEntity<OrderResponseDTO> updateOrderStatus(
+            @PathVariable UUID uuid,
+            @Valid @RequestBody UpdateOrderStatusRequestDTO request
+    ) {
+        OrderResponseDTO updatedOrder =
+                orderService.updateOrderStatus(uuid, request.status());
+
+        return ResponseEntity.ok(updatedOrder);
     }
 
     @DeleteMapping("/{uuid}")

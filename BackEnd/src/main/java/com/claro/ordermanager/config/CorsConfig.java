@@ -1,4 +1,4 @@
-package com.claro.ordermanager.configurations;
+package com.claro.ordermanager.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

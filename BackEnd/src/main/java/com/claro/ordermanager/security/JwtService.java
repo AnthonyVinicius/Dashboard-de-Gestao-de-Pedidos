@@ -15,19 +15,30 @@ import java.util.UUID;
 public class JwtService {
 
     private final SecretKey key;
+    private final long expiration;
 
-    public JwtService(@Value("${security.jwt.secret}") String secret) {
+    public JwtService(
+            @Value("${security.jwt.secret}") String secret,
+            @Value("${security.jwt.expiration}") long expiration
+    ) {
+
         if (secret == null || secret.length() < 32) {
-            throw new IllegalArgumentException("security.jwt.secret deve ter pelo menos 32 caracteres");
+            throw new IllegalArgumentException(
+                    "security.jwt.secret deve ter pelo menos 32 caracteres"
+            );
         }
+
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        this.expiration = expiration;
     }
 
     public String generateToken(UUID userId, String userName) {
+
         return Jwts.builder()
                 .setSubject(userId.toString())
                 .claim("name", userName)
                 .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(key)
                 .compact();
     }

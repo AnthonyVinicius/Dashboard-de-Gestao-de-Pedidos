@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-public record OrderRequest(
+public record OrderRequestDTO(
 
         @NotBlank(message = "Customer name is required")
         @Size(min = 5,message = "Customer name must contain at least 5 characters")

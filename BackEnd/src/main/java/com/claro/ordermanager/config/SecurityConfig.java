@@ -1,4 +1,4 @@
-package com.claro.ordermanager.configurations;
+package com.claro.ordermanager.config;
 
 import com.claro.ordermanager.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
