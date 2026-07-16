@@ -1,28 +1,63 @@
 <div class="card">
   <h2>Login</h2>
 
-  <form autocomplete="on">
+  <form
+    [formGroup]="loginForm"
+    (ngSubmit)="submit()"
+    autocomplete="on"
+  >
     <label for="email">Email</label>
+
     <input
       id="email"
       type="email"
-      name="username"
+      formControlName="email"
       autocomplete="username"
       placeholder="seu@email.com"
     />
 
+    @if (
+      loginForm.controls.email.invalid &&
+      loginForm.controls.email.touched
+    ) {
+      <small class="error">
+        Digite um e-mail válido.
+      </small>
+    }
+
     <label for="password">Password</label>
+
     <input
       id="password"
       type="password"
-      name="password"
+      formControlName="password"
       autocomplete="current-password"
       placeholder="******"
     />
 
-    <app-button type="submit" [fullWidth]="true">
+    @if (
+      loginForm.controls.password.invalid &&
+      loginForm.controls.password.touched
+    ) {
+      <small class="error">
+        A senha é obrigatória.
+      </small>
+    }
+
+    <app-button
+      type="submit"
+      [fullWidth]="true"
+      [loading]="loading"
+      [disabled]="loginForm.invalid"
+    >
       Login
     </app-button>
+
+    @if (errorMessage) {
+      <p class="error">
+        {{ errorMessage }}
+      </p>
+    }
   </form>
 
   <p class="hint">

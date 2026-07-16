@@ -1,0 +1,150 @@
+<div class="order-create-page">
+  <header class="page-header">
+    <div>
+      <span class="eyebrow">Gerenciamento</span>
+      <h1>Novo pedido</h1>
+      <p>Preencha os dados abaixo para cadastrar um novo pedido.</p>
+    </div>
+
+    <button
+      type="button"
+      class="back-button"
+      [disabled]="loading"
+      (click)="goBack()"
+    >
+      ← Voltar
+    </button>
+  </header>
+
+  @if (reachedLimit) {
+    <div class="feedback feedback--error">
+      O limite máximo de {{ orderLimit }} pedidos foi atingido.
+      Exclua um pedido antes de realizar um novo cadastro.
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="feedback feedback--error">
+      {{ errorMessage }}
+    </div>
+  }
+
+  <section class="form-card">
+    <form [formGroup]="orderForm" (ngSubmit)="submitOrder()">
+      <div class="form-group">
+        <label for="client">Cliente</label>
+
+        <input
+          id="client"
+          type="text"
+          formControlName="client"
+          placeholder="Digite o nome do cliente"
+          [class.input-error]="isInvalid('client')"
+        />
+
+        @if (hasError("client", "required")) {
+          <small class="field-error">
+            O nome do cliente é obrigatório.
+          </small>
+        }
+
+        @if (hasError("client", "minlength")) {
+          <small class="field-error">
+            O nome do cliente deve ter no mínimo 5 caracteres.
+          </small>
+        }
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="weight">Peso em kg</label>
+
+          <input
+            id="weight"
+            type="number"
+            formControlName="weight"
+            placeholder="Ex.: 2,5"
+            min="0.001"
+            step="0.001"
+            [class.input-error]="isInvalid('weight')"
+          />
+
+          <small class="field-hint">
+            O peso será armazenado em gramas.
+          </small>
+
+          @if (hasError("weight", "required")) {
+            <small class="field-error">
+              O peso é obrigatório.
+            </small>
+          }
+
+          @if (hasError("weight", "min")) {
+            <small class="field-error">
+              O peso deve ser maior que zero.
+            </small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="items">Quantidade de itens</label>
+
+          <input
+            id="items"
+            type="number"
+            formControlName="items"
+            placeholder="Ex.: 3"
+            min="1"
+            step="1"
+            [class.input-error]="isInvalid('items')"
+          />
+
+          @if (hasError("items", "required")) {
+            <small class="field-error">
+              A quantidade de itens é obrigatória.
+            </small>
+          }
+
+          @if (hasError("items", "min")) {
+            <small class="field-error">
+              O pedido deve possuir pelo menos 1 item.
+            </small>
+          }
+
+          @if (hasError("items", "integer")) {
+            <small class="field-error">
+              A quantidade de itens deve ser um número inteiro.
+            </small>
+          }
+        </div>
+      </div>
+
+      <div class="initial-status">
+        <span>Status inicial</span>
+        <strong>Em processamento</strong>
+      </div>
+
+      <div class="form-actions">
+        <app-button
+          type="button"
+          [disabled]="loading"
+          (click)="goBack()"
+        >
+          Cancelar
+        </app-button>
+
+        <app-button
+          type="submit"
+          [disabled]="loading || reachedLimit"
+        >
+          @if (loading) {
+            <span class="spinner"></span>
+            Cadastrando...
+          } @else {
+            Cadastrar pedido
+          }
+        </app-button>
+      </div>
+    </form>
+  </section>
+</div>

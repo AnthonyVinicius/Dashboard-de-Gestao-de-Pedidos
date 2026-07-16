@@ -1,0 +1,140 @@
+<div class="dashboard-page">
+  <header class="page-header">
+    <div>
+      <span class="eyebrow">Order Manager</span>
+
+      <h1>Olá, seja bem-vindo!</h1>
+
+      <p>
+        Monitore os pedidos cadastrados, acompanhe os status
+        e visualize os principais indicadores do sistema.
+      </p>
+    </div>
+
+  </header>
+
+  @if (loading) {
+    <div class="feedback feedback--loading">
+      Carregando indicadores...
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="feedback feedback--error">
+      {{ errorMessage }}
+    </div>
+  }
+
+  <section class="summary-grid">
+    <article class="summary-card">
+      <div class="summary-icon">📦</div>
+
+      <div>
+        <span>Total de pedidos</span>
+        <strong>{{ totalOrders }}</strong>
+      </div>
+    </article>
+
+    <article class="summary-card">
+      <div class="summary-icon">⚙️</div>
+
+      <div>
+        <span>Em processamento</span>
+        <strong>{{ processingOrders }}</strong>
+      </div>
+    </article>
+
+    <article class="summary-card">
+      <div class="summary-icon">⚖️</div>
+
+      <div>
+        <span>Peso total</span>
+        <strong>
+          {{ totalWeightKg | number: '1.1-2' }} kg
+        </strong>
+      </div>
+    </article>
+  </section>
+
+  <section class="charts-grid">
+    <article class="chart-card">
+      <div class="card-heading">
+        <div>
+          <h2>Pedidos por status</h2>
+
+          <p>
+            Distribuição atual dos pedidos cadastrados.
+          </p>
+        </div>
+      </div>
+
+      <div class="bar-chart">
+        @for (status of statuses; track status.name) {
+          <div class="bar-item">
+            <span class="bar-value">
+              {{ status.value }}
+            </span>
+
+            <div class="bar-track">
+              <div
+                class="bar-fill"
+                [class]="status.cssClass"
+                [style.height.%]="getBarHeight(status.value)"
+              ></div>
+            </div>
+
+            <span class="bar-label">
+              {{ status.name }}
+            </span>
+          </div>
+        }
+      </div>
+    </article>
+
+    <article class="chart-card limit-card">
+      <div class="card-heading">
+        <div>
+          <h2>Limite de pedidos</h2>
+
+          <p>
+            Uso atual da capacidade máxima do sistema.
+          </p>
+        </div>
+      </div>
+
+      <div class="limit-content">
+        <div
+          class="donut-chart"
+          [style.--percentage]="limitPercentage + '%'"
+        >
+          <div class="donut-center">
+            <strong>{{ totalOrders }}</strong>
+            <span>de {{ orderLimit }}</span>
+          </div>
+        </div>
+
+        <div class="limit-info">
+          <strong>
+            {{ limitPercentage | number: '1.0-0' }}%
+          </strong>
+
+          <span>
+            da capacidade utilizada
+          </span>
+
+          <div class="limit-progress">
+            <div
+              class="limit-progress__fill"
+              [style.width.%]="limitPercentage"
+            ></div>
+          </div>
+
+          <small>
+            Restam {{ remainingOrders }}
+            pedido(s) disponível(is).
+          </small>
+        </div>
+      </div>
+    </article>
+  </section>
+</div>

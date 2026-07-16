@@ -18,8 +18,10 @@ export class ButtonComponent {
 
   @Output() clicked = new EventEmitter<MouseEvent>();
 
-  onClick(ev: MouseEvent) {
-    if (this.disabled || this.loading) return;
-    this.clicked.emit(ev);
+onClick(event: MouseEvent): void {
+  if (this.disabled || this.loading) {
+    return;
   }
+  this.clicked.emit(event);
+}
 }
