@@ -5,33 +5,53 @@ import com.claro.ordermanager.dto.LoginResponseDTO;
 import com.claro.ordermanager.entity.User;
 import com.claro.ordermanager.repository.UserRepository;
 import com.claro.ordermanager.security.JwtService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-
-    public AuthService(UserRepository userRepository,
-                       BCryptPasswordEncoder passwordEncoder,
-                       JwtService jwtService) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtService = jwtService;
-    }
+    private final PasswordEncoder passwordEncoder;
 
     public LoginResponseDTO login(LoginRequestDTO dto) {
+
+        log.info("Login attempt for email {}.", dto.email());
+
         User user = userRepository.findByEmail(dto.email())
-                .orElseThrow(() -> new RuntimeException("Credenciais inválidas"));
+                .orElseThrow(() -> {
+                    log.warn(
+                            "Login failed. User with email {} was not found.",
+                            dto.email()
+                    );
+
+                    return new RuntimeException("Credenciais inválidas");
+                });
 
         if (!passwordEncoder.matches(dto.password(), user.getPassword())) {
+
+            log.warn(
+                    "Login failed. Invalid password for user {}.",
+                    user.getId()
+            );
+
             throw new RuntimeException("Credenciais inválidas");
         }
 
-        String token = jwtService.generateToken(user.getId(), user.getName());
+        String token = jwtService.generateToken(
+                user.getId(),
+                user.getName()
+        );
+
+        log.info(
+                "User {} authenticated successfully.",
+                user.getId()
+        );
 
         return new LoginResponseDTO(token);
     }

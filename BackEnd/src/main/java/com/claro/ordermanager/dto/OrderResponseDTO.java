@@ -4,7 +4,7 @@ import com.claro.ordermanager.entity.OrderStatus;
 
 import java.util.UUID;
 
-public record OrderResponse(
+public record OrderResponseDTO(
         UUID id,
         String displayName,
         Integer items,

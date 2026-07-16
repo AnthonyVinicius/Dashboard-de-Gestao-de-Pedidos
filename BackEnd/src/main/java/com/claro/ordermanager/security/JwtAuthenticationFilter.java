@@ -1,9 +1,12 @@
 package com.claro.ordermanager.security;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -14,14 +17,12 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.UUID;
 
+@Slf4j
+@RequiredArgsConstructor
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-
-    public JwtAuthenticationFilter(JwtService jwtService) {
-        this.jwtService = jwtService;
-    }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
@@ -32,8 +33,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         return path.startsWith("/api/auth/")
-                || (path.equals("/api/users")
-                && "POST".equalsIgnoreCase(request.getMethod()));
+                || (
+                path.equals("/api/users")
+                        && "POST".equalsIgnoreCase(request.getMethod())
+        );
     }
 
     @Override
@@ -52,27 +55,51 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = authHeader.substring(7);
 
-        if (!jwtService.isTokenValid(token)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+        try {
+            if (!jwtService.isTokenValid(token)) {
+                log.warn(
+                        "Invalid or expired JWT for request {} {}.",
+                        request.getMethod(),
+                        request.getRequestURI()
+                );
 
-        UUID userId = jwtService.extractUserId(token);
+                filterChain.doFilter(request, response);
+                return;
+            }
 
-        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            UUID userId = jwtService.extractUserId(token);
 
-            var authentication = new UsernamePasswordAuthenticationToken(
-                    userId.toString(),
-                    null,
-                    Collections.emptyList()
+            if (SecurityContextHolder.getContext().getAuthentication() == null) {
+
+                var authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                userId.toString(),
+                                null,
+                                Collections.emptyList()
+                        );
+
+                authentication.setDetails(
+                        new WebAuthenticationDetailsSource()
+                                .buildDetails(request)
+                );
+
+                SecurityContextHolder.getContext()
+                        .setAuthentication(authentication);
+
+                log.debug(
+                        "User {} authenticated for request {} {}.",
+                        userId,
+                        request.getMethod(),
+                        request.getRequestURI()
+                );
+            }
+
+        } catch (JwtException | IllegalArgumentException exception) {
+            log.warn(
+                    "JWT authentication failed for request {} {}.",
+                    request.getMethod(),
+                    request.getRequestURI()
             );
-
-            authentication.setDetails(
-                    new WebAuthenticationDetailsSource().buildDetails(request)
-            );
-
-            SecurityContextHolder.getContext()
-                    .setAuthentication(authentication);
         }
 
         filterChain.doFilter(request, response);
