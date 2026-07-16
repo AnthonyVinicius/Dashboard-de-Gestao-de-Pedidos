@@ -1,28 +1,81 @@
 <div class="card">
   <h2>Register</h2>
 
-  <form>
-    <label>Name</label>
+  <form
+    [formGroup]="registerForm"
+    (ngSubmit)="submit()"
+  >
+    <label for="name">Name</label>
+
     <input
+      id="name"
       type="text"
+      formControlName="name"
+      autocomplete="name"
       placeholder="Your full name"
     />
 
-    <label>Email</label>
+    @if (
+      registerForm.controls.name.invalid &&
+      registerForm.controls.name.touched
+    ) {
+      <small class="error">
+        O nome deve possuir pelo menos 3 caracteres.
+      </small>
+    }
+
+    <label for="email">Email</label>
+
     <input
+      id="email"
       type="email"
+      formControlName="email"
+      autocomplete="email"
       placeholder="your@email.com"
     />
 
-    <label>Password</label>
+    @if (
+      registerForm.controls.email.invalid &&
+      registerForm.controls.email.touched
+    ) {
+      <small class="error">
+        Digite um e-mail válido.
+      </small>
+    }
+
+    <label for="password">Password</label>
+
     <input
+      id="password"
       type="password"
+      formControlName="password"
+      autocomplete="new-password"
       placeholder="******"
     />
 
-    <app-button type="submit" [fullWidth]="true">
+    @if (
+      registerForm.controls.password.invalid &&
+      registerForm.controls.password.touched
+    ) {
+      <small class="error">
+        A senha deve possuir pelo menos 8 caracteres.
+      </small>
+    }
+
+    <app-button
+      type="submit"
+      [fullWidth]="true"
+      [loading]="loading"
+      [disabled]="registerForm.invalid"
+    >
       Register
     </app-button>
+
+    @if (errorMessage) {
+      <p class="error">
+        {{ errorMessage }}
+      </p>
+    }
   </form>
 
   <p class="hint">

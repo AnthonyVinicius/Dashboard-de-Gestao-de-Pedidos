@@ -1,0 +1,213 @@
+<div class="orders-page">
+  <header class="orders-header">
+    <div>
+      <span class="eyebrow">Gerenciamento</span>
+
+      <h1>Pedidos</h1>
+
+      <p>Gerencie os pedidos cadastrados e atualize seus status.</p>
+    </div>
+
+    <app-button
+      type="button"
+      [fullWidth]="true"
+      [loading]="loading"
+      [disabled]="reachedLimit"
+      (click)="addOrder()"
+    >
+      + Adicionar pedido
+    </app-button>
+  </header>
+
+  @if (reachedLimit) {
+    <div class="limit-alert">
+      O limite máximo de {{ orderLimit }} pedidos foi atingido.
+    </div>
+  }
+
+  @if (loading) {
+    <div class="feedback feedback--loading">
+      Carregando pedidos...
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="feedback feedback--error">
+      {{ errorMessage }}
+    </div>
+  }
+
+  <section class="filters">
+    <div class="search-field">
+      <span>⌕</span>
+
+      <input
+        type="search"
+        [(ngModel)]="search"
+        placeholder="Buscar por cliente"
+      />
+    </div>
+
+    <select [(ngModel)]="selectedStatus">
+      <option value="">Todos os status</option>
+
+      <option [ngValue]="OrderStatus.PROCESSING">
+        Em processamento
+      </option>
+
+      <option [ngValue]="OrderStatus.PAUSED">
+        Pausado
+      </option>
+
+      <option [ngValue]="OrderStatus.CANCELED">
+        Cancelado
+      </option>
+    </select>
+
+    <span class="orders-count">
+      {{ filteredOrders.length }} pedido(s)
+    </span>
+  </section>
+
+  <section class="table-card">
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Itens</th>
+            <th>Peso</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (order of filteredOrders; track order.id) {
+            <tr>
+              <td>
+                <div class="customer">
+                  <div class="avatar">
+                    {{ order.displayName.charAt(0) }}
+                  </div>
+
+                  <strong>
+                    {{ order.displayName }}
+                  </strong>
+                </div>
+              </td>
+
+              <td>
+                {{ order.items }} item(ns)
+              </td>
+
+              <td>
+                {{ weightInKg(order.weight) | number: "1.1-2" }}
+                kg
+              </td>
+
+              <td>
+                <span
+                  class="status-badge"
+                  [class.status-badge--processing]="
+                    order.status === OrderStatus.PROCESSING
+                  "
+                  [class.status-badge--paused]="
+                    order.status === OrderStatus.PAUSED
+                  "
+                  [class.status-badge--canceled]="
+                    order.status === OrderStatus.CANCELED
+                  "
+                >
+                  {{ formatStatus(order.status) }}
+                </span>
+              </td>
+
+              <td>
+                <div class="actions">
+                  <button
+                    type="button"
+                    class="action action--process"
+                    [disabled]="
+                      !canChangeTo(
+                        order.status,
+                        OrderStatus.PROCESSING
+                      )
+                    "
+                    (click)="
+                      updateStatus(
+                        order,
+                        OrderStatus.PROCESSING
+                      )
+                    "
+                  >
+                    Processar
+                  </button>
+
+                  <button
+                    type="button"
+                    class="action action--pause"
+                    [disabled]="
+                      !canChangeTo(
+                        order.status,
+                        OrderStatus.PAUSED
+                      )
+                    "
+                    (click)="
+                      updateStatus(
+                        order,
+                        OrderStatus.PAUSED
+                      )
+                    "
+                  >
+                    Pausar
+                  </button>
+
+                  <button
+                    type="button"
+                    class="action action--cancel"
+                    [disabled]="
+                      !canChangeTo(
+                        order.status,
+                        OrderStatus.CANCELED
+                      )
+                    "
+                    (click)="
+                      updateStatus(
+                        order,
+                        OrderStatus.CANCELED
+                      )
+                    "
+                  >
+                    Cancelar
+                  </button>
+
+                  <button
+                    type="button"
+                    class="action action--delete"
+                    (click)="deleteOrder(order)"
+                  >
+                    Excluir
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="empty-state">
+                Nenhum pedido encontrado.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  @if (message) {
+    <div class="toast">
+      <span>✓</span>
+      {{ message }}
+    </div>
+  }
+</div>
