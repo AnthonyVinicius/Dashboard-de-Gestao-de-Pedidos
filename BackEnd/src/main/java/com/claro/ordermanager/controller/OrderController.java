@@ -1,8 +1,8 @@
-package com.claro.pedidos.controller;
+package com.claro.ordermanager.controller;
 
-import com.claro.pedidos.dto.PedidoRequest;
-import com.claro.pedidos.dto.PedidoResponse;
-import com.claro.pedidos.service.OrderService;
+import com.claro.ordermanager.dto.OrderRequest;
+import com.claro.ordermanager.dto.OrderResponse;
+import com.claro.ordermanager.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,45 +14,44 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/pedidos")
-public class PedidoController {
+@RequestMapping("/api/order")
+public class OrderController {
 
     private final OrderService orderService;
 
     @GetMapping
-    public ResponseEntity<List<PedidoResponse>> getAllPedidos() {
+    public ResponseEntity<List<OrderResponse>> getAllOrders() {
         return ResponseEntity.ok(
-                orderService.getAllPedidos()
+                orderService.getAllOrders()
         );
     }
 
     @GetMapping("/{uuid}")
-    public ResponseEntity<PedidoResponse> getPedidoById(
+    public ResponseEntity<OrderResponse> getOrderById(
             @PathVariable UUID uuid
     ) {
         return ResponseEntity.ok(
-                orderService.getPedidoById(uuid)
+                orderService.getOrderById(uuid)
         );
     }
 
     @PostMapping
-    public ResponseEntity<PedidoResponse> createPedido(
-            @Valid @RequestBody PedidoRequest request
+    public ResponseEntity<OrderResponse> createOrder(
+            @Valid @RequestBody OrderRequest request
     ) {
-        PedidoResponse pedidoCriado =
-                orderService.createPedido(request);
+        OrderResponse createdOrder =
+                orderService.createOrder(request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(pedidoCriado);
+                .body(createdOrder);
     }
 
     @DeleteMapping("/{uuid}")
-    public ResponseEntity<Void> deletePedido(
+    public ResponseEntity<Void> deleteOrder(
             @PathVariable UUID uuid
     ) {
-        orderService.deletePedido(uuid);
-
+        orderService.deleteOrder(uuid);
         return ResponseEntity.noContent().build();
     }
 }

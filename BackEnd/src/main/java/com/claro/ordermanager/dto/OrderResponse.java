@@ -1,14 +1,14 @@
-package com.claro.pedidos.dto;
+package com.claro.ordermanager.dto;
 
-import com.claro.pedidos.entity.StatusPedido;
+import com.claro.ordermanager.entity.OrderStatus;
 
 import java.util.UUID;
 
-public record PedidoResponse(
+public record OrderResponse(
         UUID id,
         String displayName,
-        Integer itens,
-        Integer peso,
-        StatusPedido status
+        Integer items,
+        Integer weight,
+        OrderStatus status
 ) {
 }

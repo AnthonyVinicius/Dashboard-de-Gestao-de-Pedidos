@@ -1,10 +1,10 @@
-package com.claro.Orders.service;
+package com.claro.ordermanager.service;
 
-import com.claro.Orders.dto.OrderRequest;
-import com.claro.Orders.dto.OrderResponse;
-import com.claro.Orders.entity.Order;
-import com.claro.Orders.entity.StatusOrder;
-import com.claro.Orders.repository.OrderRepository;
+import com.claro.ordermanager.dto.OrderRequest;
+import com.claro.ordermanager.dto.OrderResponse;
+import com.claro.ordermanager.entity.Order;
+import com.claro.ordermanager.entity.OrderStatus;
+import com.claro.ordermanager.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class OrderService {
 
-    private static final int LIMITE_MAXIMO_OrderS = 5;
+    private static final int ORDER_LIMIT = 5;
 
     private final OrderRepository OrderRepository;
 
@@ -26,50 +26,49 @@ public class OrderService {
                 .toList();
     }
 
-    public OrderResponse getOrderById(UUID OrderUUID) {
-        Order Order = findOrderById(OrderUUID);
-
-        return toResponse(Order);
+    public OrderResponse getOrderById(UUID orderUUID) {
+        Order order = findOrderById(orderUUID);
+        return toResponse(order);
     }
 
     public OrderResponse createOrder(OrderRequest request) {
-        if (OrderRepository.count() >= LIMITE_MAXIMO_OrderS) {
+        if (OrderRepository.count() >= ORDER_LIMIT) {
             throw new RuntimeException(
-                    "O limite máximo de 5 Orders foi atingido"
+                    "The maximum limit of 5 orders has been reached."
             );
         }
 
-        Order Order = new Order();
+        Order order = new Order();
 
-        Order.setDisplayName(request.displayName());
-        Order.setItens(request.itens());
-        Order.setPeso(request.peso());
-        Order.setStatus(StatusOrder.EM_PROCESSAMENTO);
+        order.setDisplayName(request.displayName());
+        order.setItems(request.items());
+        order.setWeight(request.weight());
+        order.setStatus(OrderStatus.PROCESSING);
 
-        Order OrderSalvo = OrderRepository.save(Order);
+        Order orderSalvo = OrderRepository.save(order);
 
-        return toResponse(OrderSalvo);
+        return toResponse(orderSalvo);
     }
 
-    public void deleteOrder(UUID OrderUUID) {
-        Order Order = findOrderById(OrderUUID);
+    public void deleteOrder(UUID orderUUID) {
+        Order order = findOrderById(orderUUID);
 
-        OrderRepository.delete(Order);
+        OrderRepository.delete(order);
     }
 
-    private Order findOrderById(UUID OrderUUID) {
-        return OrderRepository.findById(OrderUUID)
+    private Order findOrderById(UUID orderUUID) {
+        return OrderRepository.findById(orderUUID)
                 .orElseThrow(() ->
-                        new RuntimeException("Order não encontrado")
+                        new RuntimeException("Order not found")
                 );
     }
 
-    private OrderResponse toResponse(Order Order) {
+    private OrderResponse toResponse(Order order) {
         return new OrderResponse(
                 order.getId(),
                 order.getDisplayName(),
-                order.getItens(),
-                order.getPeso(),
+                order.getItems(),
+                order.getWeight(),
                 order.getStatus()
         );
     }

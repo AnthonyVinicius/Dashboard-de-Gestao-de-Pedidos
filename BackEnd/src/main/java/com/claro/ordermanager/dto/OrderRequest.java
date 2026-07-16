@@ -1,31 +1,31 @@
-package com.claro.pedidos.dto;
+package com.claro.ordermanager.dto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-public record PedidoRequest(
+public record OrderRequest(
 
-        @NotBlank(message = "O nome do cliente é obrigatório")
+        @NotBlank(message = "Customer name is required")
         @Size(
                 min = 5,
-                message = "O nome do cliente deve ter no mínimo 5 caracteres"
+                message = "Customer name must contain at least 5 characters"
         )
         String displayName,
 
-        @NotNull(message = "A quantidade de itens é obrigatória")
+        @NotNull(message = "Item quantity is required")
         @Min(
                 value = 1,
-                message = "A quantidade de itens deve ser maior que zero"
+                message = "Item quantity must be greater than zero"
         )
-        Integer itens,
+        Integer items,
 
-        @NotNull(message = "O peso é obrigatório")
+        @NotNull(message = "Weight is required")
         @Min(
                 value = 1,
-                message = "O peso deve ser maior que zero"
+                message = "Weight must be greater than zero"
         )
-        Integer peso
+        Integer weight
 ) {
 }
