@@ -1,0 +1,18 @@
+<button
+  class="btn"
+  [class.btn--full]="fullWidth"
+  [attr.type]="routerLink ? 'button' : type"
+  [disabled]="disabled || loading"
+  [routerLink]="routerLink"
+  (click)="onClick($event)"
+>
+  <span class="btn__icon" *ngIf="!loading">
+    <ng-content select="[icon]"></ng-content>
+  </span>
+
+  <span class="spinner" *ngIf="loading" aria-hidden="true"></span>
+
+  <span class="btn__label">
+    <ng-content></ng-content>
+  </span>
+</button>
