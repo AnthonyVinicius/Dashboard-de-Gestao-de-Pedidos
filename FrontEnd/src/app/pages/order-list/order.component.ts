@@ -1,24 +1,39 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { Order, OrderStatus } from '../../models/order';
 import { OrderService } from '../../services/order.service';
-import { ButtonComponent } from '../../shared/ui/button/button.component';
 
 @Component({
   selector: 'app-orders',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonComponent],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    DecimalPipe, 
+    RouterModule,
+    MatCardModule, 
+    MatButtonModule, 
+    MatFormFieldModule, 
+    MatInputModule, 
+    MatSelectModule, 
+    MatProgressSpinnerModule
+  ],
   templateUrl: './order.component.html',
   styleUrls: ['./order.component.scss'],
 })
 export class OrderComponent implements OnInit {
   readonly OrderStatus = OrderStatus;
   readonly orderLimit = this.orderService.orderLimit;
-  sortDirection: 'asc' | 'desc' = 'asc';
   orders: Order[] = [];
 
   search = '';
@@ -98,10 +113,8 @@ export class OrderComponent implements OnInit {
       this.showMessage(
         `O limite máximo de ${this.orderLimit} pedidos foi atingido.`,
       );
-
       return;
     }
-
     void this.router.navigate(['/order/create']);
   }
 
@@ -131,8 +144,7 @@ export class OrderComponent implements OnInit {
           this.orders = this.orders.map((currentOrder) =>
             currentOrder.id === updatedOrder.id ? updatedOrder : currentOrder,
           );
-
-          this.showMessage('Status atualizado com sucesso.');
+          this.showMessage('Status updated successfully.');
         },
         error: (error) => {
           this.errorMessage =
@@ -172,7 +184,6 @@ export class OrderComponent implements OnInit {
           this.orders = this.orders.filter(
             (currentOrder) => currentOrder.id !== order.id,
           );
-
           this.showMessage('Pedido excluído com sucesso.');
         },
         error: (error) => {
@@ -186,17 +197,10 @@ export class OrderComponent implements OnInit {
 
   canChangeTo(currentStatus: OrderStatus, newStatus: OrderStatus): boolean {
     const transitions: Record<OrderStatus, OrderStatus[]> = {
-      [OrderStatus.EM_PROCESSAMENTO]: [
-        OrderStatus.PAUSADO,
-        OrderStatus.CANCELADO,
-      ],
-      [OrderStatus.PAUSADO]: [
-        OrderStatus.EM_PROCESSAMENTO,
-        OrderStatus.CANCELADO,
-      ],
+      [OrderStatus.EM_PROCESSAMENTO]: [OrderStatus.PAUSADO, OrderStatus.CANCELADO],
+      [OrderStatus.PAUSADO]: [OrderStatus.EM_PROCESSAMENTO, OrderStatus.CANCELADO],
       [OrderStatus.CANCELADO]: [OrderStatus.EM_PROCESSAMENTO],
     };
-
     return transitions[currentStatus].includes(newStatus);
   }
 
@@ -206,7 +210,6 @@ export class OrderComponent implements OnInit {
       [OrderStatus.PAUSADO]: 'Pausado',
       [OrderStatus.CANCELADO]: 'Cancelado',
     };
-
     return labels[status];
   }
 

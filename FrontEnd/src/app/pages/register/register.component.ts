@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
-import {
-  FormBuilder,
-  ReactiveFormsModule,
-  Validators
-} from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-
-import { ButtonComponent } from '../../shared/ui/button/button.component';
+import { RouterModule } from '@angular/router';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -14,36 +14,31 @@ import { AuthService } from '../../services/auth.service';
   standalone: true,
   imports: [
     RouterLink,
-    ButtonComponent,
-    ReactiveFormsModule
+    RouterModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
+    ReactiveFormsModule,
   ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent {
-
   loading = false;
   errorMessage = '';
 
   registerForm = this.formBuilder.nonNullable.group({
-    name: ['', [
-      Validators.required,
-      Validators.minLength(3)
-    ]],
-    email: ['', [
-      Validators.required,
-      Validators.email
-    ]],
-    password: ['', [
-      Validators.required,
-      Validators.minLength(8)
-    ]]
+    name: ['', [Validators.required, Validators.minLength(3)]],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(8)]],
   });
 
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly authService: AuthService,
-    private readonly router: Router
+    private readonly router: Router,
   ) {}
 
   submit(): void {
@@ -55,19 +50,16 @@ export class RegisterComponent {
     this.loading = true;
     this.errorMessage = '';
 
-    this.authService
-      .register(this.registerForm.getRawValue())
-      .subscribe({
-        next: () => {
-          this.loading = false;
-          void this.router.navigate(['/login']);
-        },
-        error: (error) => {
-          this.loading = false;
-          this.errorMessage =
-            error.error?.message ??
-            'Não foi possível cadastrar o usuário.';
-        }
-      });
+    this.authService.register(this.registerForm.getRawValue()).subscribe({
+      next: () => {
+        this.loading = false;
+        void this.router.navigate(['/login']);
+      },
+      error: (error) => {
+        this.loading = false;
+        this.errorMessage =
+          error.error?.message ?? 'Não foi possível cadastrar o usuário.';
+      },
+    });
   }
 }

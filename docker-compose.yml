@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: 1312
 
     ports:
-      - "5432:5432"
+      - "5432:5433"
 
     volumes:
       - postgres-data:/var/lib/postgresql/data
@@ -21,7 +21,6 @@ services:
       retries: 5
 
     restart: unless-stopped
-
 
   backend:
     build:
@@ -52,7 +51,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "wget -q --spider http://localhost:8080/actuator/health || exit 1"
+          "wget -q --spider http://localhost:8080/actuator/health || exit 1",
         ]
       interval: 15s
       timeout: 5s
@@ -60,7 +59,6 @@ services:
       start_period: 30s
 
     restart: unless-stopped
-
 
   frontend:
     build:
@@ -78,7 +76,6 @@ services:
 
     restart: unless-stopped
 
-
   prometheus:
     image: prom/prometheus:latest
     container_name: order-manager-prometheus
@@ -95,7 +92,6 @@ services:
         condition: service_healthy
 
     restart: unless-stopped
-
 
   grafana:
     image: grafana/grafana-oss:latest
@@ -119,7 +115,6 @@ services:
       - prometheus
 
     restart: unless-stopped
-
 
 volumes:
   postgres-data:

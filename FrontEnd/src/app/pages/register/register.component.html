@@ -1,85 +1,81 @@
-<div class="card">
-  <h2>Register</h2>
+<mat-card class="auth-card">
+  <mat-card-header>
+    <mat-card-title>Register</mat-card-title>
+  </mat-card-header>
 
-  <form
-    [formGroup]="registerForm"
-    (ngSubmit)="submit()"
-  >
-    <label for="name">Name</label>
+  <mat-card-content>
+    <form [formGroup]="registerForm" (ngSubmit)="submit()">
+      
+      <mat-form-field appearance="outline">
+        <mat-label>Name</mat-label>
+        <input
+          matInput
+          id="name"
+          type="text"
+          formControlName="name"
+          autocomplete="name"
+          placeholder="Your full name"
+        />
+        @if (registerForm.controls.name.invalid && registerForm.controls.name.touched) {
+          <mat-error>O nome deve possuir pelo menos 3 caracteres.</mat-error>
+        }
+      </mat-form-field>
 
-    <input
-      id="name"
-      type="text"
-      formControlName="name"
-      autocomplete="name"
-      placeholder="Your full name"
-    />
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input
+          matInput
+          id="email"
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+          placeholder="your@email.com"
+        />
+        @if (registerForm.controls.email.invalid && registerForm.controls.email.touched) {
+          <mat-error>Digite um e-mail válido.</mat-error>
+        }
+      </mat-form-field>
 
-    @if (
-      registerForm.controls.name.invalid &&
-      registerForm.controls.name.touched
-    ) {
-      <small class="error">
-        O nome deve possuir pelo menos 3 caracteres.
-      </small>
-    }
+      <mat-form-field appearance="outline">
+        <mat-label>Password</mat-label>
+        <input
+          matInput
+          id="password"
+          type="password"
+          formControlName="password"
+          autocomplete="new-password"
+          placeholder="******"
+        />
+        @if (registerForm.controls.password.invalid && registerForm.controls.password.touched) {
+          <mat-error>A senha deve possuir pelo menos 8 caracteres.</mat-error>
+        }
+      </mat-form-field>
 
-    <label for="email">Email</label>
+      <button
+        mat-flat-button
+        color="primary"
+        type="submit"
+        class="submit-button"
+        [disabled]="registerForm.invalid || loading"
+      >
+        @if (loading) {
+          <span class="button-loading-content">
+            <mat-spinner diameter="20" color="accent"></mat-spinner>
+            Carregando...
+          </span>
+        } @else {
+          Register
+        }
+      </button>
 
-    <input
-      id="email"
-      type="email"
-      formControlName="email"
-      autocomplete="email"
-      placeholder="your@email.com"
-    />
+      @if (errorMessage) {
+        <p class="error-message">{{ errorMessage }}</p>
+      }
+    </form>
 
-    @if (
-      registerForm.controls.email.invalid &&
-      registerForm.controls.email.touched
-    ) {
-      <small class="error">
-        Digite um e-mail válido.
-      </small>
-    }
-
-    <label for="password">Password</label>
-
-    <input
-      id="password"
-      type="password"
-      formControlName="password"
-      autocomplete="new-password"
-      placeholder="******"
-    />
-
-    @if (
-      registerForm.controls.password.invalid &&
-      registerForm.controls.password.touched
-    ) {
-      <small class="error">
-        A senha deve possuir pelo menos 8 caracteres.
-      </small>
-    }
-
-    <app-button
-      type="submit"
-      [fullWidth]="true"
-      [loading]="loading"
-      [disabled]="registerForm.invalid || loading"
-    >
-      Register
-    </app-button>
-
-    @if (errorMessage) {
-      <p class="error">
-        {{ errorMessage }}
-      </p>
-    }
-  </form>
-
-  <p class="hint">
-    Already have an account?
-    <a routerLink="/login">Login</a>
-  </p>
-</div>
+    <p class="hint">
+      Already have an account?
+      <a routerLink="/login">Login</a>
+    </p>
+  </mat-card-content>
+</mat-card>

@@ -6,145 +6,134 @@
       <p>Preencha os dados abaixo para cadastrar um novo pedido.</p>
     </div>
 
-    <app-button
+    <button
+      mat-stroked-button
       type="button"
-      class="back-button"
       [disabled]="loading"
       (click)="goBack()"
     >
-      ← Voltar
-    </app-button>
+      Voltar
+    </button>
   </header>
 
   @if (reachedLimit) {
-    <div class="feedback feedback--error">
-      O limite máximo de {{ orderLimit }} pedidos foi atingido.
-      Exclua um pedido antes de realizar um novo cadastro.
-    </div>
+    <mat-card class="feedback-card error-card">
+      <mat-card-content>
+        O limite máximo de {{ orderLimit }} pedidos foi atingido.
+        Exclua um pedido antes de realizar um novo cadastro.
+      </mat-card-content>
+    </mat-card>
   }
 
   @if (errorMessage) {
-    <div class="feedback feedback--error">
-      {{ errorMessage }}
-    </div>
+    <mat-card class="feedback-card error-card">
+      <mat-card-content>{{ errorMessage }}</mat-card-content>
+    </mat-card>
   }
 
-  <section class="form-card">
-    <form [formGroup]="orderForm" (ngSubmit)="submitOrder()">
-      <div class="form-group">
-        <label for="client">Cliente</label>
-
-        <input
-          id="client"
-          type="text"
-          formControlName="client"
-          placeholder="Digite o nome do cliente"
-          [class.input-error]="isInvalid('client')"
-        />
-
-        @if (hasError("client", "required")) {
-          <small class="field-error">
-            O nome do cliente é obrigatório.
-          </small>
-        }
-
-        @if (hasError("client", "minlength")) {
-          <small class="field-error">
-            O nome do cliente deve ter no mínimo 5 caracteres.
-          </small>
-        }
-      </div>
-
-      <div class="form-row">
+  <mat-card class="form-card">
+    <mat-card-content>
+      <form [formGroup]="orderForm" (ngSubmit)="submitOrder()">
+        
         <div class="form-group">
-          <label for="weight">Peso em kg</label>
-
-          <input
-            id="weight"
-            type="number"
-            formControlName="weight"
-            placeholder="Ex.: 2,5"
-            min="0.001"
-            step="0.001"
-            [class.input-error]="isInvalid('weight')"
-          />
-
-          <small class="field-hint">
-            O peso será armazenado em gramas.
-          </small>
-
-          @if (hasError("weight", "required")) {
-            <small class="field-error">
-              O peso é obrigatório.
-            </small>
-          }
-
-          @if (hasError("weight", "min")) {
-            <small class="field-error">
-              O peso deve ser maior que zero.
-            </small>
-          }
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Cliente</mat-label>
+            <input
+              matInput
+              id="client"
+              type="text"
+              formControlName="client"
+              placeholder="Digite o nome do cliente"
+            />
+            @if (hasError("client", "required")) {
+              <mat-error>O nome do cliente é obrigatório.</mat-error>
+            }
+            @if (hasError("client", "minlength")) {
+              <mat-error>O nome do cliente deve ter no mínimo 5 caracteres.</mat-error>
+            }
+          </mat-form-field>
         </div>
 
-        <div class="form-group">
-          <label for="items">Quantidade de itens</label>
+        <div class="form-row">
+          <div class="form-group">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Peso em kg</mat-label>
+              <input
+                matInput
+                id="weight"
+                type="number"
+                formControlName="weight"
+                placeholder="Ex.: 2,5"
+                min="0.001"
+                step="0.001"
+              />
+              <mat-hint>O peso será armazenado em gramas.</mat-hint>
+              @if (hasError("weight", "required")) {
+                <mat-error>O peso é obrigatório.</mat-error>
+              }
+              @if (hasError("weight", "min")) {
+                <mat-error>O peso deve ser maior que zero.</mat-error>
+              }
+            </mat-form-field>
+          </div>
 
-          <input
-            id="items"
-            type="number"
-            formControlName="items"
-            placeholder="Ex.: 3"
-            min="1"
-            step="1"
-            [class.input-error]="isInvalid('items')"
-          />
-
-          @if (hasError("items", "required")) {
-            <small class="field-error">
-              A quantidade de itens é obrigatória.
-            </small>
-          }
-
-          @if (hasError("items", "min")) {
-            <small class="field-error">
-              O pedido deve possuir pelo menos 1 item.
-            </small>
-          }
-
-          @if (hasError("items", "integer")) {
-            <small class="field-error">
-              A quantidade de itens deve ser um número inteiro.
-            </small>
-          }
+          <div class="form-group">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Quantidade de itens</mat-label>
+              <input
+                matInput
+                id="items"
+                type="number"
+                formControlName="items"
+                placeholder="Ex.: 3"
+                min="1"
+                step="1"
+              />
+              @if (hasError("items", "required")) {
+                <mat-error>A quantidade de itens é obrigatória.</mat-error>
+              }
+              @if (hasError("items", "min")) {
+                <mat-error>O pedido deve possuir pelo menos 1 item.</mat-error>
+              }
+              @if (hasError("items", "integer")) {
+                <mat-error>A quantidade de itens deve ser um número inteiro.</mat-error>
+              }
+            </mat-form-field>
+          </div>
         </div>
-      </div>
 
-      <div class="initial-status">
-        <span>Status inicial</span>
-        <strong>Em processamento</strong>
-      </div>
+        <div class="initial-status">
+          <span>Status inicial</span>
+          <span class="status-badge">Em processamento</span>
+        </div>
 
-      <div class="form-actions">
-        <app-button
-          type="button"
-          [disabled]="loading"
-          (click)="goBack()"
-        >
-          Cancelar
-        </app-button>
+        <div class="form-actions">
+          <button
+            mat-button
+            type="button"
+            [disabled]="loading"
+            (click)="goBack()"
+          >
+            Cancelar
+          </button>
 
-        <app-button
-          type="submit"
-          [disabled]="loading || reachedLimit"
-        >
-          @if (loading) {
-            <span class="spinner"></span>
-            Cadastrando...
-          } @else {
-            Cadastrar pedido
-          }
-        </app-button>
-      </div>
-    </form>
-  </section>
+          <button
+            mat-flat-button
+            color="primary"
+            type="submit"
+            [disabled]="loading || reachedLimit"
+          >
+            @if (loading) {
+              <span class="btn-loading">
+                <mat-spinner diameter="18" color="accent"></mat-spinner>
+                Cadastrando...
+              </span>
+            } @else {
+              Cadastrar pedido
+            }
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
 </div>

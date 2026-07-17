@@ -2,76 +2,71 @@
   <header class="orders-header">
     <div>
       <span class="eyebrow">Gerenciamento</span>
-
       <h1>Pedidos</h1>
-
       <p>Gerencie os pedidos cadastrados e atualize seus status.</p>
     </div>
 
-    <app-button
+    <button
+      mat-flat-button
+      color="primary"
       type="button"
-      [fullWidth]="true"
-      [loading]="loading"
       [disabled]="reachedLimit || processingOrderId !== null"
       (click)="addOrder()"
     >
       + Adicionar pedido
-    </app-button>
+    </button>
   </header>
 
   @if (reachedLimit) {
-    <div class="limit-alert">
-      O limite máximo de {{ orderLimit }} pedidos foi atingido.
-    </div>
+    <mat-card class="alert-card limit-alert">
+      <mat-card-content>
+        O limite máximo de {{ orderLimit }} pedidos foi atingido.
+      </mat-card-content>
+    </mat-card>
   }
 
   @if (loading) {
-    <div class="feedback feedback--loading">
-      Carregando pedidos...
+    <div class="feedback-container">
+      <mat-spinner diameter="30"></mat-spinner>
+      <span>Carregando pedidos...</span>
     </div>
   }
 
   @if (errorMessage) {
-    <div class="feedback feedback--error">
-      {{ errorMessage }}
-    </div>
+    <mat-card class="alert-card error-alert">
+      <mat-card-content>{{ errorMessage }}</mat-card-content>
+    </mat-card>
   }
 
   <section class="filters">
-    <div class="search-field">
-      <span>⌕</span>
-
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Buscar por cliente</mat-label>
       <input
+        matInput
         type="search"
         [(ngModel)]="search"
-        placeholder="Buscar por cliente"
+        placeholder="Ex.: João Silva"
       />
-    </div>
+    </mat-form-field>
 
-    <select [(ngModel)]="selectedStatus">
-      <option value="">Todos os status</option>
+    <mat-form-field appearance="outline" class="status-field">
+      <mat-label>Filtrar por status</mat-label>
+      <mat-select [(ngModel)]="selectedStatus">
+        <mat-option value="">Todos os status</mat-option>
+        <mat-option [value]="OrderStatus.EM_PROCESSAMENTO"
+          >Em processamento</mat-option
+        >
+        <mat-option [value]="OrderStatus.PAUSADO">Pausado</mat-option>
+        <mat-option [value]="OrderStatus.CANCELADO">Cancelado</mat-option>
+      </mat-select>
+    </mat-form-field>
 
-      <option [ngValue]="OrderStatus.EM_PROCESSAMENTO">
-        Em processamento
-      </option>
-
-      <option [ngValue]="OrderStatus.PAUSADO">
-        Pausado
-      </option>
-
-      <option [ngValue]="OrderStatus.CANCELADO">
-        Cancelado
-      </option>
-    </select>
-
-    <span class="orders-count">
-      {{ filteredOrders.length }} pedido(s)
-    </span>
+    <span class="orders-count"> {{ filteredOrders.length }} pedido(s) </span>
   </section>
 
-  <section class="table-card">
+  <mat-card class="table-card">
     <div class="table-wrapper">
-      <table>
+      <table class="mat-styled-table">
         <thead>
           <tr>
             <th>Cliente</th>
@@ -90,21 +85,13 @@
                   <div class="avatar">
                     {{ order.displayName.charAt(0) }}
                   </div>
-
-                  <strong>
-                    {{ order.displayName }}
-                  </strong>
+                  <strong>{{ order.displayName }}</strong>
                 </div>
               </td>
 
-              <td>
-                {{ order.items }} item(ns)
-              </td>
+              <td>{{ order.items }} item(ns)</td>
 
-              <td>
-                {{ weightInKg(order.weight) | number: "1.1-2" }}
-                kg
-              </td>
+              <td>{{ weightInKg(order.weight) | number: "1.1-2" }} kg</td>
 
               <td>
                 <span
@@ -126,91 +113,68 @@
               <td>
                 <div class="actions">
                   <button
+                    mat-stroked-button
                     type="button"
-                    class="action action--process"
+                    class="btn-action btn-action--process"
                     [disabled]="
                       processingOrderId === order.id ||
-                      !canChangeTo(
-                        order.status,
-                        OrderStatus.EM_PROCESSAMENTO
-                      )
+                      !canChangeTo(order.status, OrderStatus.EM_PROCESSAMENTO)
                     "
-                    (click)="
-                      updateStatus(
-                        order,
-                        OrderStatus.EM_PROCESSAMENTO
-                      )
-                    "
+                    (click)="updateStatus(order, OrderStatus.EM_PROCESSAMENTO)"
                   >
                     Processar
                   </button>
 
                   <button
+                    mat-stroked-button
                     type="button"
-                    class="action action--pause"
+                    class="btn-action btn-action--paused"
                     [disabled]="
                       processingOrderId === order.id ||
-                      !canChangeTo(
-                        order.status,
-                        OrderStatus.PAUSADO
-                      )
+                      !canChangeTo(order.status, OrderStatus.PAUSADO)
                     "
-                    (click)="
-                      updateStatus(
-                        order,
-                        OrderStatus.PAUSADO
-                      )
-                    "
+                    (click)="updateStatus(order, OrderStatus.PAUSADO)"
                   >
                     Pausar
                   </button>
 
                   <button
+                    mat-stroked-button
                     type="button"
-                    class="action action--cancel"
+                    class="btn-action btn-action--canceled"
                     [disabled]="
                       processingOrderId === order.id ||
-                      !canChangeTo(
-                        order.status,
-                        OrderStatus.CANCELADO
-                      )
+                      !canChangeTo(order.status, OrderStatus.CANCELADO)
                     "
-                    (click)="
-                      updateStatus(
-                        order,
-                        OrderStatus.CANCELADO
-                      )
-                    "
+                    (click)="updateStatus(order, OrderStatus.CANCELADO)"
                   >
                     Cancelar
                   </button>
 
                   <button
+                    mat-button
+                    color="warn"
                     type="button"
-                    class="action action--delete"
+                    class="btn-action-delete"
                     [disabled]="processingOrderId === order.id"
                     (click)="deleteOrder(order)"
                   >
-                    @if (processingOrderId === order.id) {
-                      Aguarde...
-                    } @else {
-                      Excluir
-                    }
+                    {{
+                      processingOrderId === order.id ? "Aguarde..." : "Excluir"
+                    }}
                   </button>
                 </div>
               </td>
             </tr>
           } @empty {
             <tr>
-              <td colspan="5" class="empty-state">
-                Nenhum pedido encontrado.
-              </td>
+              <td colspan="5" class="empty-state">Nenhum pedido encontrado.</td>
             </tr>
           }
         </tbody>
       </table>
     </div>
-  </section>
+  </mat-card>
 
   @if (message) {
     <div class="toast">

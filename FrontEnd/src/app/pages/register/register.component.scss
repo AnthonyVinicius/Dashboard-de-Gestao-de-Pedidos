@@ -1,43 +1,64 @@
-.card { 
-    max-width: 380px; 
-    margin: 40px auto; 
-    padding: 18px; 
-    border: 1px solid #ddd; 
-    border-radius: 10px;
-    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.3); 
+:host {
+  display: block;
 }
 
-form { 
-    display: grid; 
-    gap: 10px; 
+.auth-card {
+  max-width: 380px;
+  margin: 40px auto;
+  padding: 8px;
+  border-radius: 10px !important;
+  box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.3) !important;
+
+  mat-card-header {
+    margin-bottom: 20px;
+    
+    mat-card-title {
+      font-size: 24px;
+      font-weight: 700;
+    }
+  }
 }
 
-input { 
-    padding: 10px; 
-    font-size: 14px;
-    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.3);
-    border: 1px solid #ddd; 
-    border-radius: 10px; 
+form {
+  display: grid;
+  gap: 4px;
 }
 
-small { 
-    color: #b00020; 
+.submit-button {
+  width: 100%; 
+  padding: 24px 0 !important;
+  border-radius: 10px !important;
+  font-size: 16px;
+  font-weight: 600;
 }
 
-.error { 
-    color: #b00020; 
-    margin: 0; 
+.button-loading-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
-.success { 
-    color: #0a7a2f; 
-    margin: 0; 
+.error-message {
+  color: #b00020;
+  margin: 12px 0 0;
+  font-size: 14px;
+  text-align: center;
 }
 
-.hint { 
-    margin-top: 12px; 
-}
+.hint {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 14px;
+  color: #6b7280;
 
-a { 
-    text-decoration: underline; 
+  a {
+    color: #2563EB;
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }

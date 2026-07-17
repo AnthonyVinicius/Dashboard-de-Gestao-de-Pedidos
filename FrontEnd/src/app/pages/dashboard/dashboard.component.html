@@ -2,9 +2,7 @@
   <header class="page-header">
     <div>
       <span class="eyebrow">Order Manager</span>
-
       <h1>Olá, seja bem-vindo!</h1>
-
       <p>
         Monitore os pedidos cadastrados, acompanhe os status e visualize os
         principais indicadores do sistema.
@@ -12,9 +10,9 @@
     </div>
 
     <div class="header-actions">
-      <app-button class="orders-button" routerLink="/orders">
+      <button mat-flat-button color="primary" routerLink="/orders">
         Ver pedidos
-      </app-button>
+      </button>
 
       <div
         class="api-status"
@@ -28,120 +26,115 @@
   </header>
 
   @if (loading) {
-    <div class="feedback feedback--loading">Carregando indicadores...</div>
-  }
-
-  @if (errorMessage) {
-    <div class="feedback feedback--error">
-      {{ errorMessage }}
+    <div class="feedback-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Carregando indicadores...</span>
     </div>
   }
 
+  @if (errorMessage) {
+    <mat-card class="feedback-error-card">
+      <mat-card-content>{{ errorMessage }}</mat-card-content>
+    </mat-card>
+  }
+
   <section class="summary-grid">
-    <article class="summary-card">
-      <div class="summary-icon">📦</div>
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <div class="summary-icon">📦</div>
+        <div>
+          <span>Total de pedidos</span>
+          <strong>{{ totalOrders }}</strong>
+        </div>
+      </mat-card-content>
+    </mat-card>
 
-      <div>
-        <span>Total de pedidos</span>
-        <strong>{{ totalOrders }}</strong>
-      </div>
-    </article>
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <div class="summary-icon">⚙️</div>
+        <div>
+          <span>Em processamento</span>
+          <strong>{{ processingOrders }}</strong>
+        </div>
+      </mat-card-content>
+    </mat-card>
 
-    <article class="summary-card">
-      <div class="summary-icon">⚙️</div>
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <div class="summary-icon">⚖️</div>
+        <div>
+          <span>Peso total</span>
+          <strong> {{ totalWeightKg | number: "1.1-2" }} kg </strong>
+        </div>
+      </mat-card-content>
+    </mat-card>
 
-      <div>
-        <span>Em processamento</span>
-        <strong>{{ processingOrders }}</strong>
-      </div>
-    </article>
-
-    <article class="summary-card">
-      <div class="summary-icon">⚖️</div>
-      <div>
-        <span>Peso total</span>
-        <strong> {{ totalWeightKg | number: "1.1-2" }} kg </strong>
-      </div>
-    </article>
-
-    <article class="summary-card">
-      <div class="summary-icon">🧾</div>
-
-      <div>
-        <span>Itens totais</span>
-        <strong>{{ totalItems }}</strong>
-      </div>
-    </article>
+    <mat-card class="summary-card">
+      <mat-card-content>
+        <div class="summary-icon">🧾</div>
+        <div>
+          <span>Itens totais</span>
+          <strong>{{ totalItems }}</strong>
+        </div>
+      </mat-card-content>
+    </mat-card>
   </section>
 
   <section class="charts-grid">
-    <article class="chart-card">
-      <div class="card-heading">
-        <div>
-          <h2>Pedidos por status</h2>
-
-          <p>Distribuição atual dos pedidos cadastrados.</p>
-        </div>
-      </div>
-
-      <div class="bar-chart">
-        @for (status of statuses; track status.name) {
-          <div class="bar-item">
-            <span class="bar-value">
-              {{ status.value }}
-            </span>
-
-            <div class="bar-track">
-              <div
-                class="bar-fill"
-                [class]="status.cssClass"
-                [style.height.%]="getBarHeight(status.value)"
-              ></div>
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Pedidos por status</mat-card-title>
+        <mat-card-subtitle>Distribuição atual dos pedidos cadastrados.</mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <div class="bar-chart">
+          @for (status of statuses; track status.name) {
+            <div class="bar-item">
+              <span class="bar-value">{{ status.value }}</span>
+              <div class="bar-track">
+                <div
+                  class="bar-fill"
+                  [class]="status.cssClass"
+                  [style.height.%]="getBarHeight(status.value)"
+                ></div>
+              </div>
+              <span class="bar-label">{{ status.name }}</span>
             </div>
-
-            <span class="bar-label">
-              {{ status.name }}
-            </span>
-          </div>
-        }
-      </div>
-    </article>
-
-    <article class="chart-card limit-card">
-      <div class="card-heading">
-        <div>
-          <h2>Limite de pedidos</h2>
-
-          <p>Uso atual da capacidade máxima do sistema.</p>
+          }
         </div>
-      </div>
+      </mat-card-content>
+    </mat-card>
 
-      <div class="limit-content">
-        <div class="donut-chart" [style.--percentage]="limitPercentage + '%'">
-          <div class="donut-center">
-            <strong>{{ totalOrders }}</strong>
-            <span>de {{ orderLimit }}</span>
-          </div>
-        </div>
+    <mat-card class="chart-card limit-card">
+      <mat-card-header>
+        <mat-card-title>Limite de pedidos</mat-card-title>
+        <mat-card-subtitle>Uso atual da capacidade máxima do sistema.</mat-card-subtitle>
+      </mat-card-header>
 
-        <div class="limit-info">
-          <strong> {{ limitPercentage | number: "1.0-0" }}% </strong>
-
-          <span> da capacidade utilizada </span>
-
-          <div class="limit-progress">
-            <div
-              class="limit-progress__fill"
-              [style.width.%]="limitPercentage"
-            ></div>
+      <mat-card-content>
+        <div class="limit-content">
+          <div class="donut-chart" [style.--percentage]="limitPercentage + '%'">
+            <div class="donut-center">
+              <strong>{{ totalOrders }}</strong>
+              <span>de {{ orderLimit }}</span>
+            </div>
           </div>
 
-          <small>
-            Restam {{ remainingOrders }}
-            pedido(s) disponível(is).
-          </small>
+          <div class="limit-info">
+            <strong>{{ limitPercentage | number: "1.0-0" }}%</strong>
+            <span>da capacidade utilizada</span>
+
+            <mat-progress-bar 
+              mode="determinate" 
+              [value]="limitPercentage" 
+              class="limit-progress-bar">
+            </mat-progress-bar>
+
+            <small>Restam {{ remainingOrders }} pedido(s) disponível(is).</small>
+          </div>
         </div>
-      </div>
-    </article>
+      </mat-card-content>
+    </mat-card>
   </section>
 </div>
