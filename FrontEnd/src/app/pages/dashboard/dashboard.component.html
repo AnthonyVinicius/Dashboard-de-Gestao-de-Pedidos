@@ -1,31 +1,31 @@
 <div class="dashboard-page">
   <header class="page-header">
-  <div>
-    <span class="eyebrow">Order Manager</span>
+    <div>
+      <span class="eyebrow">Order Manager</span>
 
-    <h1>Olá, seja bem-vindo!</h1>
+      <h1>Olá, seja bem-vindo!</h1>
 
-    <p>
-      Monitore os pedidos cadastrados, acompanhe os status e visualize os
-      principais indicadores do sistema.
-    </p>
-  </div>
-
-  <div class="header-actions">
-    <app-button class="orders-button" router="/orders">
-      Ver pedidos
-    </app-button>
-
-    <div
-      class="api-status"
-      [class.api-status--online]="apiOnline"
-      [class.api-status--offline]="!apiOnline"
-    >
-      <span class="api-status__dot"></span>
-      {{ apiOnline ? "API online" : "API indisponível" }}
+      <p>
+        Monitore os pedidos cadastrados, acompanhe os status e visualize os
+        principais indicadores do sistema.
+      </p>
     </div>
-  </div>
-</header>
+
+    <div class="header-actions">
+      <app-button class="orders-button" routerLink="/orders">
+        Ver pedidos
+      </app-button>
+
+      <div
+        class="api-status"
+        [class.api-status--online]="apiOnline"
+        [class.api-status--offline]="!apiOnline"
+      >
+        <span class="api-status__dot"></span>
+        {{ apiOnline ? "API online" : "API indisponível" }}
+      </div>
+    </div>
+  </header>
 
   @if (loading) {
     <div class="feedback feedback--loading">Carregando indicadores...</div>

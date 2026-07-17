@@ -67,17 +67,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
       {
         name: 'Em processamento',
         value: this.processingOrders,
-        cssClass: 'em_processamento',
+        cssClass: 'processing',
       },
       {
         name: 'Pausados',
         value: this.pausedOrders,
-        cssClass: 'pausados',
+        cssClass: 'paused',
       },
       {
         name: 'Cancelados',
         value: this.canceledOrders,
-        cssClass: 'cancelados',
+        cssClass: 'canceled',
       },
     ];
   }
