@@ -5,52 +5,52 @@
 /dataSources.local.xml
 /httpRequests/
 
-backend/HELP.md
-backend/target/
-backend/.mvn/wrapper/maven-wrapper.jar
+Backend/HELP.md
+Backend/target/
+Backend/.mvn/wrapper/maven-wrapper.jar
 
-!backend/**/src/main/**/target/
-!backend/**/src/test/**/target/
+!Backend/**/src/main/**/target/
+!Backend/**/src/test/**/target/
 
-backend/.apt_generated
-backend/.classpath
-backend/.factorypath
-backend/.project
-backend/.settings/
-backend/.springBeans
-backend/.sts4-cache
+Backend/.apt_generated
+Backend/.classpath
+Backend/.factorypath
+Backend/.project
+Backend/.settings/
+Backend/.springBeans
+Backend/.sts4-cache
 
-backend/.idea/
-backend/*.iws
-backend/*.iml
-backend/*.ipr
+Backend/.idea/
+Backend/*.iws
+Backend/*.iml
+Backend/*.ipr
 
-backend/nbproject/private/
-backend/nbbuild/
-backend/dist/
-backend/nbdist/
-backend/.nb-gradle/
-backend/build/
+Backend/nbproject/private/
+Backend/nbbuild/
+Backend/dist/
+Backend/nbdist/
+Backend/.nb-gradle/
+Backend/build/
 
-!backend/**/src/main/**/build/
-!backend/**/src/test/**/build/
+!Backend/**/src/main/**/build/
+!Backend/**/src/test/**/build/
 
-frontend/node_modules/
-frontend/dist/
-frontend/.angular/
-frontend/.angular/cache/
-frontend/tmp/
-frontend/out-tsc/
-frontend/bazel-out/
-frontend/coverage/
-frontend/.sass-cache/
-frontend/connect.lock
-frontend/libpeerconnection.log
-frontend/testem.log
-frontend/typings/
+Frontend/node_modules/
+Frontend/dist/
+Frontend/.angular/
+Frontend/.angular/cache/
+Frontend/tmp/
+Frontend/out-tsc/
+Frontend/bazel-out/
+Frontend/coverage/
+Frontend/.sass-cache/
+Frontend/connect.lock
+Frontend/libpeerconnection.log
+Frontend/testem.log
+Frontend/typings/
 
-frontend/npm-debug.log*
-frontend/yarn-error.log*
+Frontend/npm-debug.log*
+Frontend/yarn-error.log*
 
 .vscode/
 .idea/

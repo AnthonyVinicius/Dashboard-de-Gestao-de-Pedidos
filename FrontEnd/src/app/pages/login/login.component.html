@@ -48,7 +48,7 @@
       type="submit"
       [fullWidth]="true"
       [loading]="loading"
-      [disabled]="loginForm.invalid"
+      [disabled]="loginForm.invalid || loading"
     >
       Login
     </app-button>

@@ -1,22 +1,34 @@
 <div class="dashboard-page">
   <header class="page-header">
-    <div>
-      <span class="eyebrow">Order Manager</span>
+  <div>
+    <span class="eyebrow">Order Manager</span>
 
-      <h1>Olá, seja bem-vindo!</h1>
+    <h1>Olá, seja bem-vindo!</h1>
 
-      <p>
-        Monitore os pedidos cadastrados, acompanhe os status
-        e visualize os principais indicadores do sistema.
-      </p>
+    <p>
+      Monitore os pedidos cadastrados, acompanhe os status e visualize os
+      principais indicadores do sistema.
+    </p>
+  </div>
+
+  <div class="header-actions">
+    <app-button class="orders-button" router="/orders">
+      Ver pedidos
+    </app-button>
+
+    <div
+      class="api-status"
+      [class.api-status--online]="apiOnline"
+      [class.api-status--offline]="!apiOnline"
+    >
+      <span class="api-status__dot"></span>
+      {{ apiOnline ? "API online" : "API indisponível" }}
     </div>
-
-  </header>
+  </div>
+</header>
 
   @if (loading) {
-    <div class="feedback feedback--loading">
-      Carregando indicadores...
-    </div>
+    <div class="feedback feedback--loading">Carregando indicadores...</div>
   }
 
   @if (errorMessage) {
@@ -46,12 +58,18 @@
 
     <article class="summary-card">
       <div class="summary-icon">⚖️</div>
-
       <div>
         <span>Peso total</span>
-        <strong>
-          {{ totalWeightKg | number: '1.1-2' }} kg
-        </strong>
+        <strong> {{ totalWeightKg | number: "1.1-2" }} kg </strong>
+      </div>
+    </article>
+
+    <article class="summary-card">
+      <div class="summary-icon">🧾</div>
+
+      <div>
+        <span>Itens totais</span>
+        <strong>{{ totalItems }}</strong>
       </div>
     </article>
   </section>
@@ -62,9 +80,7 @@
         <div>
           <h2>Pedidos por status</h2>
 
-          <p>
-            Distribuição atual dos pedidos cadastrados.
-          </p>
+          <p>Distribuição atual dos pedidos cadastrados.</p>
         </div>
       </div>
 
@@ -96,17 +112,12 @@
         <div>
           <h2>Limite de pedidos</h2>
 
-          <p>
-            Uso atual da capacidade máxima do sistema.
-          </p>
+          <p>Uso atual da capacidade máxima do sistema.</p>
         </div>
       </div>
 
       <div class="limit-content">
-        <div
-          class="donut-chart"
-          [style.--percentage]="limitPercentage + '%'"
-        >
+        <div class="donut-chart" [style.--percentage]="limitPercentage + '%'">
           <div class="donut-center">
             <strong>{{ totalOrders }}</strong>
             <span>de {{ orderLimit }}</span>
@@ -114,13 +125,9 @@
         </div>
 
         <div class="limit-info">
-          <strong>
-            {{ limitPercentage | number: '1.0-0' }}%
-          </strong>
+          <strong> {{ limitPercentage | number: "1.0-0" }}% </strong>
 
-          <span>
-            da capacidade utilizada
-          </span>
+          <span> da capacidade utilizada </span>
 
           <div class="limit-progress">
             <div

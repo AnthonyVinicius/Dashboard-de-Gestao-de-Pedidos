@@ -6,14 +6,14 @@
       <p>Preencha os dados abaixo para cadastrar um novo pedido.</p>
     </div>
 
-    <button
+    <app-button
       type="button"
       class="back-button"
       [disabled]="loading"
       (click)="goBack()"
     >
       ← Voltar
-    </button>
+    </app-button>
   </header>
 
   @if (reachedLimit) {

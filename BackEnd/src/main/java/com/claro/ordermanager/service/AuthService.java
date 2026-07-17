@@ -3,6 +3,7 @@ package com.claro.ordermanager.service;
 import com.claro.ordermanager.dto.LoginRequestDTO;
 import com.claro.ordermanager.dto.LoginResponseDTO;
 import com.claro.ordermanager.entity.User;
+import com.claro.ordermanager.exception.InvalidCredentialsException;
 import com.claro.ordermanager.repository.UserRepository;
 import com.claro.ordermanager.security.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -25,22 +26,16 @@ public class AuthService {
 
         User user = userRepository.findByEmail(dto.email())
                 .orElseThrow(() -> {
-                    log.warn(
-                            "Login failed. User with email {} was not found.",
-                            dto.email()
-                    );
+                    log.warn("Login failed. User with email {} was not found.",dto.email());
 
-                    return new RuntimeException("Credenciais inválidas");
+                    return new InvalidCredentialsException("E-mail ou senha inválidos.");
                 });
 
         if (!passwordEncoder.matches(dto.password(), user.getPassword())) {
 
-            log.warn(
-                    "Login failed. Invalid password for user {}.",
-                    user.getId()
-            );
+            log.warn("Login failed. Invalid password for user {}.",user.getId());
 
-            throw new RuntimeException("Credenciais inválidas");
+            throw new InvalidCredentialsException("E-mail ou senha inválidos.");
         }
 
         String token = jwtService.generateToken(
@@ -48,10 +43,7 @@ public class AuthService {
                 user.getName()
         );
 
-        log.info(
-                "User {} authenticated successfully.",
-                user.getId()
-        );
+        log.info("User {} authenticated successfully.",user.getId());
 
         return new LoginResponseDTO(token);
     }

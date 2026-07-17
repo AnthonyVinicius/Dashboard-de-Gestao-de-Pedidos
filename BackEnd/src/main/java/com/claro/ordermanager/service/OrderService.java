@@ -4,6 +4,9 @@ import com.claro.ordermanager.dto.OrderRequestDTO;
 import com.claro.ordermanager.dto.OrderResponseDTO;
 import com.claro.ordermanager.entity.Order;
 import com.claro.ordermanager.entity.OrderStatus;
+import com.claro.ordermanager.exception.InvalidStatusTransitionException;
+import com.claro.ordermanager.exception.OrderLimitReachedException;
+import com.claro.ordermanager.exception.OrderNotFoundException;
 import com.claro.ordermanager.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,12 +52,9 @@ public class OrderService {
         log.info("Creating order for '{}'.", request.displayName());
 
         if (orderRepository.count() >= ORDER_LIMIT) {
+            log.warn("Order creation blocked: maximum limit of {} reached.", ORDER_LIMIT);
 
-            log.warn("Order creation denied. Maximum limit of {} orders reached.", ORDER_LIMIT);
-
-            throw new RuntimeException(
-                    "The maximum limit of " + ORDER_LIMIT + " orders has been reached."
-            );
+            throw new OrderLimitReachedException("O limite máximo de " + ORDER_LIMIT + " pedidos foi atingido.");
         }
 
         Order order = new Order();
@@ -62,7 +62,7 @@ public class OrderService {
         order.setDisplayName(request.displayName());
         order.setItems(request.items());
         order.setWeight(request.weight());
-        order.setStatus(OrderStatus.PROCESSING);
+        order.setStatus(OrderStatus.EM_PROCESSAMENTO);
 
         Order savedOrder = orderRepository.save(order);
 
@@ -72,22 +72,34 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponseDTO updateOrderStatus(
-            UUID orderUUID,
-            OrderStatus status
-    ) {
-
+    public OrderResponseDTO updateOrderStatus(UUID orderUUID, OrderStatus status) {
         log.info("Updating order {} to status {}.", orderUUID, status);
-
         Order order = findOrderById(orderUUID);
 
+        if (!isValidTransition(order.getStatus(), status)) {
+            log.warn("Invalid status transition for order {}: {} -> {}",orderUUID,order.getStatus(),status);
+
+            throw new InvalidStatusTransitionException("Transição de status inválida: "+ order.getStatus()+ " -> "+ status);
+        }
         order.setStatus(status);
-
         Order updatedOrder = orderRepository.save(order);
-
         log.info("Order {} updated successfully.", updatedOrder.getId());
-
         return toResponse(updatedOrder);
+    }
+
+    private boolean isValidTransition(OrderStatus current, OrderStatus next) {
+        return switch (current) {
+            case EM_PROCESSAMENTO ->
+                    next == OrderStatus.PAUSADO ||
+                            next == OrderStatus.CANCELADO;
+
+            case PAUSADO ->
+                    next == OrderStatus.EM_PROCESSAMENTO ||
+                            next == OrderStatus.CANCELADO;
+
+            case CANCELADO ->
+                    next == OrderStatus.EM_PROCESSAMENTO;
+        };
     }
 
     @Transactional
@@ -109,10 +121,9 @@ public class OrderService {
 
                     log.error("Order {} not found.", orderUUID);
 
-                    return new RuntimeException("Order not found");
+                    return new OrderNotFoundException( "Pedido não encontrado com o id: " + orderUUID);
                 });
     }
-
     private OrderResponseDTO toResponse(Order order) {
         return new OrderResponseDTO(
                 order.getId(),

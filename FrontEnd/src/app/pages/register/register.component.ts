@@ -60,7 +60,7 @@ export class RegisterComponent {
       .subscribe({
         next: () => {
           this.loading = false;
-          this.router.navigate(['/login']);
+          void this.router.navigate(['/login']);
         },
         error: (error) => {
           this.loading = false;
