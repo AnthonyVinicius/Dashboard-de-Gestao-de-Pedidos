@@ -8,26 +8,28 @@ import { catchError, throwError } from 'rxjs';
 
 import { AuthService } from '../services/auth.service';
 
-export const authInterceptor: HttpInterceptorFn = (
-  req,
-  next,
-) => {
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
   const token = authService.getToken();
 
-  const request = token
-    ? req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-    : req;
+  const isPublicRequest =
+    req.url.includes('/auth/login') ||
+    req.url.includes('/users');
+
+  const request =
+    token && token !== 'undefined' && token !== 'null' && !isPublicRequest
+      ? req.clone({
+          setHeaders: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+      : req;
 
   return next(request).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401) {
+      if (error.status === 401 && !isPublicRequest) {
         authService.logout();
         void router.navigate(['/login']);
       }
