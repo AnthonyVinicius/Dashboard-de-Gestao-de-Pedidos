@@ -9,10 +9,13 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
-
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { OrderCreate } from '../../models/order';
 import { OrderService } from '../../services/order.service';
-import { ButtonComponent } from '../../shared/ui/button/button.component';
 
 @Component({
   selector: 'app-order-create',
@@ -20,7 +23,11 @@ import { ButtonComponent } from '../../shared/ui/button/button.component';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    ButtonComponent,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './order-create.component.html',
   styleUrl: './order-create.component.scss',
@@ -29,28 +36,9 @@ export class OrderCreateComponent implements OnInit {
   readonly orderLimit = this.orderService.orderLimit;
 
   readonly orderForm = this.formBuilder.nonNullable.group({
-    client: [
-      '',
-      [
-        Validators.required,
-        Validators.minLength(5),
-      ],
-    ],
-    weight: [
-      0,
-      [
-        Validators.required,
-        Validators.min(0.001),
-      ],
-    ],
-    items: [
-      1,
-      [
-        Validators.required,
-        Validators.min(1),
-        this.integerValidator,
-      ],
-    ],
+    client: ['', [Validators.required, Validators.minLength(5)]],
+    weight: [0, [Validators.required, Validators.min(0.001)]],
+    items: [1, [Validators.required, Validators.min(1), this.integerValidator]],
   });
 
   loading = false;
@@ -75,8 +63,7 @@ export class OrderCreateComponent implements OnInit {
     this.errorMessage = '';
 
     if (this.reachedLimit) {
-      this.errorMessage =
-        `O limite máximo de ${this.orderLimit} pedidos foi atingido.`;
+      this.errorMessage = `O limite máximo de ${this.orderLimit} pedidos foi atingido.`;
 
       return;
     }
@@ -143,58 +130,39 @@ export class OrderCreateComponent implements OnInit {
   isInvalid(fieldName: string): boolean {
     const field = this.orderForm.get(fieldName);
 
-    return Boolean(
-      field?.invalid &&
-      (field.dirty || field.touched),
-    );
+    return Boolean(field?.invalid && (field.dirty || field.touched));
   }
 
-  hasError(
-    fieldName: string,
-    errorName: string,
-  ): boolean {
+  hasError(fieldName: string, errorName: string): boolean {
     const field = this.orderForm.get(fieldName);
 
     return Boolean(
-      field?.hasError(errorName) &&
-      (field.dirty || field.touched),
+      field?.hasError(errorName) && (field.dirty || field.touched),
     );
   }
 
   private checkOrderLimit(): void {
     this.orderService.getAll().subscribe({
       next: (orders) => {
-        this.reachedLimit =
-          orders.length >= this.orderLimit;
+        this.reachedLimit = orders.length >= this.orderLimit;
       },
       error: () => {
-        this.errorMessage =
-          'Não foi possível verificar o limite de pedidos.';
+        this.errorMessage = 'Não foi possível verificar o limite de pedidos.';
       },
     });
   }
 
-  private convertKgToGrams(
-    weightInKg: number,
-  ): number {
+  private convertKgToGrams(weightInKg: number): number {
     return Math.round(weightInKg * 1000);
   }
 
-  private integerValidator(
-    control: AbstractControl,
-  ): ValidationErrors | null {
+  private integerValidator(control: AbstractControl): ValidationErrors | null {
     const value = control.value;
 
-    if (
-      value === null ||
-      value === undefined ||
-      value === ''
-    ) {
+    if (value === null || value === undefined || value === '') {
       return null;
     }
 
-    return Number.isInteger(Number(value))
-      ? null
-      : { integer: true };
+    return Number.isInteger(Number(value)) ? null : { integer: true };
   }
 }

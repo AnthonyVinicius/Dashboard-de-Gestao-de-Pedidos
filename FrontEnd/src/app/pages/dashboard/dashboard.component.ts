@@ -2,11 +2,16 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { interval, startWith, Subject, switchMap, takeUntil } from 'rxjs';
-import { ButtonComponent } from '../../shared/ui/button/button.component';
 import { Order, OrderStatus } from '../../models/order';
 import { OrderService } from '../../services/order.service';
 import { environment } from '../../../environments/environment';
 import { RouterLink } from '@angular/router';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { RouterModule } from '@angular/router';
+import { DecimalPipe } from '@angular/common';
 interface StatusSummary {
   name: string;
   value: number;
@@ -16,7 +21,7 @@ interface StatusSummary {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ButtonComponent, RouterLink],
+  imports: [CommonModule, RouterLink, MatCardModule, MatButtonModule, MatProgressBarModule, MatProgressSpinnerModule, RouterModule, DecimalPipe],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
