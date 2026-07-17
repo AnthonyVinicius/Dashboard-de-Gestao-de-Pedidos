@@ -157,7 +157,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "pedidos_total{job=\"order-manager\"}",
+          "expr": "sum(pedidos_by_status{job=\"order-manager\"})",
           "legendFormat": "Pedidos",
           "range": false,
           "instant": true,

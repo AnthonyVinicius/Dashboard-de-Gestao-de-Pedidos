@@ -1,16 +1,106 @@
 services:
+  database:
+    image: postgres:16-alpine
+    container_name: order-manager-database
+
+    environment:
+      POSTGRES_DB: ordermanager
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1312
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ordermanager"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    restart: unless-stopped
+
+
+  backend:
+    build:
+      context: ./BackEnd
+      dockerfile: Dockerfile
+
+    container_name: order-manager-backend
+
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/ordermanager
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 1312
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      JWT_SECRET: minhaChaveSuperSecretaParaJwtComMaisDe32Caracteres123
+      JWT_EXPIRATION: 3600000
+
+    ports:
+      - "8080:8080"
+
+    depends_on:
+      database:
+        condition: service_healthy
+
+    volumes:
+      - backend-logs:/app/logs
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -q --spider http://localhost:8080/actuator/health || exit 1"
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+    restart: unless-stopped
+
+
+  frontend:
+    build:
+      context: ./FrontEnd
+      dockerfile: Dockerfile
+
+    container_name: order-manager-frontend
+
+    ports:
+      - "4200:80"
+
+    depends_on:
+      backend:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+
   prometheus:
     image: prom/prometheus:latest
-    container_name: prometheus
+    container_name: order-manager-prometheus
+
     ports:
       - "9090:9090"
+
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+
+    depends_on:
+      backend:
+        condition: service_healthy
+
     restart: unless-stopped
+
 
   grafana:
     image: grafana/grafana-oss:latest
-    container_name: grafana
+    container_name: order-manager-grafana
+
     ports:
       - "3000:3000"
 
@@ -19,15 +109,20 @@ services:
       GF_SECURITY_ADMIN_PASSWORD: admin
       GF_USERS_ALLOW_SIGN_UP: "false"
 
-    depends_on:
-      - prometheus
-
     volumes:
+      - grafana-data:/var/lib/grafana
       - ./monitoring/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
       - ./monitoring/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
       - ./monitoring/dashboards:/var/lib/grafana/dashboards:ro
 
+    depends_on:
+      - prometheus
+
     restart: unless-stopped
 
+
 volumes:
-  grafana-storage:
+  postgres-data:
+  backend-logs:
+  prometheus-data:
+  grafana-data:
