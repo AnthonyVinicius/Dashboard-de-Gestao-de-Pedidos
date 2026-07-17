@@ -9,11 +9,11 @@ import org.springframework.context.annotation.Configuration;
 public class OpenApiConfig {
 
     @Bean
-    public OpenAPI vmsOpenAPI() {
+    public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("VMS Manager API")
-                        .description("API para cadastro e gerenciamento de máquinas virtuais")
+                        .title("Order Manager API")
+                        .description("API REST para gestão de pedidos de e-commerce")
                         .version("1.0.0"));
     }
 }

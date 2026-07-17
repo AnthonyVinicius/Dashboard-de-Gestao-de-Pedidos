@@ -11,18 +11,14 @@ import { ButtonComponent } from '../../shared/ui/button/button.component';
 @Component({
   selector: 'app-orders',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    ButtonComponent,
-  ],
+  imports: [CommonModule, FormsModule, ButtonComponent],
   templateUrl: './order.component.html',
   styleUrls: ['./order.component.scss'],
 })
 export class OrderComponent implements OnInit {
   readonly OrderStatus = OrderStatus;
   readonly orderLimit = this.orderService.orderLimit;
-
+  sortDirection: 'asc' | 'desc' = 'asc';
   orders: Order[] = [];
 
   search = '';
@@ -31,6 +27,8 @@ export class OrderComponent implements OnInit {
   loading = false;
   message = '';
   errorMessage = '';
+
+  processingOrderId: string | null = null;
 
   constructor(
     private readonly orderService: OrderService,
@@ -65,8 +63,7 @@ export class OrderComponent implements OnInit {
         .includes(normalizedSearch);
 
       const matchesStatus =
-        !this.selectedStatus ||
-        order.status === this.selectedStatus;
+        !this.selectedStatus || order.status === this.selectedStatus;
 
       return matchesName && matchesStatus;
     });
@@ -108,30 +105,34 @@ export class OrderComponent implements OnInit {
     void this.router.navigate(['/order/create']);
   }
 
-  updateStatus(
-    order: Order,
-    newStatus: OrderStatus,
-  ): void {
+  updateStatus(order: Order, newStatus: OrderStatus): void {
     this.errorMessage = '';
+
+    if (this.processingOrderId) {
+      return;
+    }
 
     if (!this.canChangeTo(order.status, newStatus)) {
       this.showMessage('Transição de status não permitida.');
       return;
     }
 
+    this.processingOrderId = order.id;
+
     this.orderService
       .updateStatus(order.id, newStatus)
+      .pipe(
+        finalize(() => {
+          this.processingOrderId = null;
+        }),
+      )
       .subscribe({
         next: (updatedOrder) => {
           this.orders = this.orders.map((currentOrder) =>
-            currentOrder.id === updatedOrder.id
-              ? updatedOrder
-              : currentOrder,
+            currentOrder.id === updatedOrder.id ? updatedOrder : currentOrder,
           );
 
-          this.showMessage(
-            'Status atualizado com sucesso.',
-          );
+          this.showMessage('Status atualizado com sucesso.');
         },
         error: (error) => {
           this.errorMessage =
@@ -145,6 +146,10 @@ export class OrderComponent implements OnInit {
   deleteOrder(order: Order): void {
     this.errorMessage = '';
 
+    if (this.processingOrderId) {
+      return;
+    }
+
     const confirmed = window.confirm(
       `Deseja realmente excluir o pedido de ${order.displayName}?`,
     );
@@ -153,41 +158,43 @@ export class OrderComponent implements OnInit {
       return;
     }
 
-    this.orderService.delete(order.id).subscribe({
-      next: () => {
-        this.orders = this.orders.filter(
-          (currentOrder) => currentOrder.id !== order.id,
-        );
+    this.processingOrderId = order.id;
 
-        this.showMessage(
-          'Pedido excluído com sucesso.',
-        );
-      },
-      error: (error) => {
-        this.errorMessage =
-          error.error?.message ??
-          error.message ??
-          'Não foi possível excluir o pedido.';
-      },
-    });
+    this.orderService
+      .delete(order.id)
+      .pipe(
+        finalize(() => {
+          this.processingOrderId = null;
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.orders = this.orders.filter(
+            (currentOrder) => currentOrder.id !== order.id,
+          );
+
+          this.showMessage('Pedido excluído com sucesso.');
+        },
+        error: (error) => {
+          this.errorMessage =
+            error.error?.message ??
+            error.message ??
+            'Não foi possível excluir o pedido.';
+        },
+      });
   }
 
-  canChangeTo(
-    currentStatus: OrderStatus,
-    newStatus: OrderStatus,
-  ): boolean {
+  canChangeTo(currentStatus: OrderStatus, newStatus: OrderStatus): boolean {
     const transitions: Record<OrderStatus, OrderStatus[]> = {
-      [OrderStatus.PROCESSING]: [
-        OrderStatus.PAUSED,
-        OrderStatus.CANCELED,
+      [OrderStatus.EM_PROCESSAMENTO]: [
+        OrderStatus.PAUSADO,
+        OrderStatus.CANCELADO,
       ],
-      [OrderStatus.PAUSED]: [
-        OrderStatus.PROCESSING,
-        OrderStatus.CANCELED,
+      [OrderStatus.PAUSADO]: [
+        OrderStatus.EM_PROCESSAMENTO,
+        OrderStatus.CANCELADO,
       ],
-      [OrderStatus.CANCELED]: [
-        OrderStatus.PROCESSING,
-      ],
+      [OrderStatus.CANCELADO]: [OrderStatus.EM_PROCESSAMENTO],
     };
 
     return transitions[currentStatus].includes(newStatus);
@@ -195,9 +202,9 @@ export class OrderComponent implements OnInit {
 
   formatStatus(status: OrderStatus): string {
     const labels: Record<OrderStatus, string> = {
-      [OrderStatus.PROCESSING]: 'Em processamento',
-      [OrderStatus.PAUSED]: 'Pausado',
-      [OrderStatus.CANCELED]: 'Cancelado',
+      [OrderStatus.EM_PROCESSAMENTO]: 'Em processamento',
+      [OrderStatus.PAUSADO]: 'Pausado',
+      [OrderStatus.CANCELADO]: 'Cancelado',
     };
 
     return labels[status];

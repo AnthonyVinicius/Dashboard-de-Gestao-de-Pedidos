@@ -18,7 +18,7 @@ import { AuthService } from '../../services/auth.service';
     ReactiveFormsModule
   ],
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css'],
+  styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent {
 
@@ -60,7 +60,7 @@ export class RegisterComponent {
       .subscribe({
         next: () => {
           this.loading = false;
-          this.router.navigate(['/login']);
+          void this.router.navigate(['/login']);
         },
         error: (error) => {
           this.loading = false;

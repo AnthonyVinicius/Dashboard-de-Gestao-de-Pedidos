@@ -12,7 +12,7 @@
       type="button"
       [fullWidth]="true"
       [loading]="loading"
-      [disabled]="reachedLimit"
+      [disabled]="reachedLimit || processingOrderId !== null"
       (click)="addOrder()"
     >
       + Adicionar pedido
@@ -51,15 +51,15 @@
     <select [(ngModel)]="selectedStatus">
       <option value="">Todos os status</option>
 
-      <option [ngValue]="OrderStatus.PROCESSING">
+      <option [ngValue]="OrderStatus.EM_PROCESSAMENTO">
         Em processamento
       </option>
 
-      <option [ngValue]="OrderStatus.PAUSED">
+      <option [ngValue]="OrderStatus.PAUSADO">
         Pausado
       </option>
 
-      <option [ngValue]="OrderStatus.CANCELED">
+      <option [ngValue]="OrderStatus.CANCELADO">
         Cancelado
       </option>
     </select>
@@ -110,13 +110,13 @@
                 <span
                   class="status-badge"
                   [class.status-badge--processing]="
-                    order.status === OrderStatus.PROCESSING
+                    order.status === OrderStatus.EM_PROCESSAMENTO
                   "
                   [class.status-badge--paused]="
-                    order.status === OrderStatus.PAUSED
+                    order.status === OrderStatus.PAUSADO
                   "
                   [class.status-badge--canceled]="
-                    order.status === OrderStatus.CANCELED
+                    order.status === OrderStatus.CANCELADO
                   "
                 >
                   {{ formatStatus(order.status) }}
@@ -129,15 +129,16 @@
                     type="button"
                     class="action action--process"
                     [disabled]="
+                      processingOrderId === order.id ||
                       !canChangeTo(
                         order.status,
-                        OrderStatus.PROCESSING
+                        OrderStatus.EM_PROCESSAMENTO
                       )
                     "
                     (click)="
                       updateStatus(
                         order,
-                        OrderStatus.PROCESSING
+                        OrderStatus.EM_PROCESSAMENTO
                       )
                     "
                   >
@@ -148,15 +149,16 @@
                     type="button"
                     class="action action--pause"
                     [disabled]="
+                      processingOrderId === order.id ||
                       !canChangeTo(
                         order.status,
-                        OrderStatus.PAUSED
+                        OrderStatus.PAUSADO
                       )
                     "
                     (click)="
                       updateStatus(
                         order,
-                        OrderStatus.PAUSED
+                        OrderStatus.PAUSADO
                       )
                     "
                   >
@@ -167,15 +169,16 @@
                     type="button"
                     class="action action--cancel"
                     [disabled]="
+                      processingOrderId === order.id ||
                       !canChangeTo(
                         order.status,
-                        OrderStatus.CANCELED
+                        OrderStatus.CANCELADO
                       )
                     "
                     (click)="
                       updateStatus(
                         order,
-                        OrderStatus.CANCELED
+                        OrderStatus.CANCELADO
                       )
                     "
                   >
@@ -185,9 +188,14 @@
                   <button
                     type="button"
                     class="action action--delete"
+                    [disabled]="processingOrderId === order.id"
                     (click)="deleteOrder(order)"
                   >
-                    Excluir
+                    @if (processingOrderId === order.id) {
+                      Aguarde...
+                    } @else {
+                      Excluir
+                    }
                   </button>
                 </div>
               </td>

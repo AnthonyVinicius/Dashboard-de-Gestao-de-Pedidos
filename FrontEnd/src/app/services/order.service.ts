@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of, throwError } from 'rxjs';
 import { Order, OrderCreate, OrderStatus } from '../models/order';
-
+import { environment } from '../../environments/environment';
 export interface OrderCreateResult {
   order: Order;
   savedLocally: boolean;
@@ -14,7 +14,7 @@ export interface OrderCreateResult {
 export class OrderService {
   readonly orderLimit = 5;
 
-  private readonly apiUrl = 'http://localhost:8080/api/order';
+  private readonly apiUrl = `${environment.apiUrl}/pedidos`;
   private readonly storageKey = 'orders';
 
   constructor(private readonly http: HttpClient) {}
@@ -142,7 +142,7 @@ export class OrderService {
       displayName: data.displayName,
       weight: data.weight,
       items: data.items,
-      status: OrderStatus.PROCESSING,
+      status: OrderStatus.EM_PROCESSAMENTO,
     };
 
     this.setLocalOrders([...orders, order]);
@@ -231,13 +231,22 @@ export class OrderService {
     currentStatus: OrderStatus,
     newStatus: OrderStatus,
   ): boolean {
+    
     const allowedTransitions: Record<OrderStatus, OrderStatus[]> = {
-      [OrderStatus.PROCESSING]: [OrderStatus.PAUSED, OrderStatus.CANCELED],
+  [OrderStatus.EM_PROCESSAMENTO]: [
+    OrderStatus.PAUSADO,
+    OrderStatus.CANCELADO,
+  ],
 
-      [OrderStatus.PAUSED]: [OrderStatus.PROCESSING, OrderStatus.CANCELED],
+  [OrderStatus.PAUSADO]: [
+    OrderStatus.EM_PROCESSAMENTO,
+    OrderStatus.CANCELADO,
+  ],
 
-      [OrderStatus.CANCELED]: [OrderStatus.PROCESSING],
-    };
+  [OrderStatus.CANCELADO]: [
+    OrderStatus.EM_PROCESSAMENTO,
+  ],
+};
 
     return allowedTransitions[currentStatus].includes(newStatus);
   }

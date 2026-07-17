@@ -3,6 +3,8 @@ package com.claro.ordermanager.service;
 import com.claro.ordermanager.dto.UserCreateDTO;
 import com.claro.ordermanager.dto.UserResponseDTO;
 import com.claro.ordermanager.entity.User;
+import com.claro.ordermanager.exception.EmailAlreadyExistsException;
+import com.claro.ordermanager.exception.UserNotFoundException;
 import com.claro.ordermanager.mapper.UserMapper;
 import com.claro.ordermanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,13 +39,7 @@ public class UserService {
 
         log.info("Searching user with id {}.", id);
 
-        User user = repository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("User {} not found.", id);
-                    return new RuntimeException("Usuário não encontrado");
-                });
-
-        return UserMapper.toDTO(user);
+        return UserMapper.toDTO(findUserById(id));
     }
 
 
@@ -56,7 +52,7 @@ public class UserService {
 
             log.warn("User creation denied. Email {} already exists.", dto.email());
 
-            throw new RuntimeException("E-mail já cadastrado");
+            throw new EmailAlreadyExistsException("E-mail já cadastrado." );
         }
 
         User user = new User();
@@ -71,19 +67,19 @@ public class UserService {
         return UserMapper.toDTO(saved);
     }
 
+    private User findUserById(UUID id) {
+
+        return repository.findById(id)
+                .orElseThrow(() -> {log.error("User {} not found.", id);
+                    return new UserNotFoundException("Usuário não encontrado com o id: " + id);
+                });
+    }
+
+
     @Transactional
     public void delete(UUID id) {
-
         log.info("Deleting user {}.", id);
-
-        User existing = repository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("User {} not found.", id);
-                    return new RuntimeException("Usuário não encontrado");
-                });
-
-        repository.delete(existing);
-
+        repository.delete(findUserById(id));
         log.info("User {} deleted successfully.", id);
     }
 }

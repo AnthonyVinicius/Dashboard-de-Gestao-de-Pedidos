@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/order")
+@RequestMapping("/api/pedidos")
 public class OrderController {
 
     private final OrderService orderService;
@@ -40,12 +40,11 @@ public class OrderController {
     public ResponseEntity<OrderResponseDTO> createOrder(
             @Valid @RequestBody OrderRequestDTO request
     ) {
-        OrderResponseDTO createdOrder =
-                orderService.createOrder(request);
+        OrderResponseDTO response = orderService.createOrder(request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(createdOrder);
+                .body(response);
     }
 
     @PatchMapping("/{uuid}/status")

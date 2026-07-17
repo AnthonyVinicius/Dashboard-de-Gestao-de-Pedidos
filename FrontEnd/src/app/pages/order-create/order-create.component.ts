@@ -2,22 +2,26 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import {
   AbstractControl,
+  FormBuilder,
   ReactiveFormsModule,
   ValidationErrors,
   Validators,
 } from '@angular/forms';
-import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { OrderCreate } from '../../models/order';
 import { OrderService } from '../../services/order.service';
-import { ButtonComponent } from "../../shared/ui/button/button.component";
+import { ButtonComponent } from '../../shared/ui/button/button.component';
 
 @Component({
   selector: 'app-order-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ButtonComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    ButtonComponent,
+  ],
   templateUrl: './order-create.component.html',
   styleUrl: './order-create.component.scss',
 })
@@ -25,9 +29,28 @@ export class OrderCreateComponent implements OnInit {
   readonly orderLimit = this.orderService.orderLimit;
 
   readonly orderForm = this.formBuilder.nonNullable.group({
-    client: ['', [Validators.required, Validators.minLength(5)]],
-    weight: [0, [Validators.required, Validators.min(0.001)]],
-    items: [1, [Validators.required, Validators.min(1), this.integerValidator]],
+    client: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(5),
+      ],
+    ],
+    weight: [
+      0,
+      [
+        Validators.required,
+        Validators.min(0.001),
+      ],
+    ],
+    items: [
+      1,
+      [
+        Validators.required,
+        Validators.min(1),
+        this.integerValidator,
+      ],
+    ],
   });
 
   loading = false;
@@ -52,7 +75,9 @@ export class OrderCreateComponent implements OnInit {
     this.errorMessage = '';
 
     if (this.reachedLimit) {
-      this.errorMessage = `O limite máximo de ${this.orderLimit} pedidos foi atingido.`;
+      this.errorMessage =
+        `O limite máximo de ${this.orderLimit} pedidos foi atingido.`;
+
       return;
     }
 
@@ -62,9 +87,19 @@ export class OrderCreateComponent implements OnInit {
     }
 
     const formValue = this.orderForm.getRawValue();
+    const clientName = formValue.client.trim();
+
+    if (clientName.length < 5) {
+      this.orderForm.controls.client.setErrors({
+        minlength: true,
+      });
+
+      this.orderForm.controls.client.markAsTouched();
+      return;
+    }
 
     const data: OrderCreate = {
-      displayName: formValue.client.trim(),
+      displayName: clientName,
       weight: this.convertKgToGrams(formValue.weight),
       items: formValue.items,
     };
@@ -73,7 +108,11 @@ export class OrderCreateComponent implements OnInit {
 
     this.orderService
       .create(data)
-      .pipe(finalize(() => (this.loading = false)))
+      .pipe(
+        finalize(() => {
+          this.loading = false;
+        }),
+      )
       .subscribe({
         next: (result) => {
           const message = result.savedLocally
@@ -104,39 +143,58 @@ export class OrderCreateComponent implements OnInit {
   isInvalid(fieldName: string): boolean {
     const field = this.orderForm.get(fieldName);
 
-    return Boolean(field?.invalid && (field.dirty || field.touched));
+    return Boolean(
+      field?.invalid &&
+      (field.dirty || field.touched),
+    );
   }
 
-  hasError(fieldName: string, errorName: string): boolean {
+  hasError(
+    fieldName: string,
+    errorName: string,
+  ): boolean {
     const field = this.orderForm.get(fieldName);
 
     return Boolean(
-      field?.hasError(errorName) && (field.dirty || field.touched),
+      field?.hasError(errorName) &&
+      (field.dirty || field.touched),
     );
   }
 
   private checkOrderLimit(): void {
     this.orderService.getAll().subscribe({
       next: (orders) => {
-        this.reachedLimit = orders.length >= this.orderLimit;
+        this.reachedLimit =
+          orders.length >= this.orderLimit;
       },
       error: () => {
-        this.errorMessage = 'Não foi possível verificar o limite de pedidos.';
+        this.errorMessage =
+          'Não foi possível verificar o limite de pedidos.';
       },
     });
   }
 
-  private convertKgToGrams(weightInKg: number): number {
+  private convertKgToGrams(
+    weightInKg: number,
+  ): number {
     return Math.round(weightInKg * 1000);
   }
 
-  private integerValidator(control: AbstractControl): ValidationErrors | null {
+  private integerValidator(
+    control: AbstractControl,
+  ): ValidationErrors | null {
     const value = control.value;
 
-    if (value === null || value === undefined || value === '') {
+    if (
+      value === null ||
+      value === undefined ||
+      value === ''
+    ) {
       return null;
     }
 
-    return Number.isInteger(Number(value)) ? null : { integer: true };
+    return Number.isInteger(Number(value))
+      ? null
+      : { integer: true };
   }
 }

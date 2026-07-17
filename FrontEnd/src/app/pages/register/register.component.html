@@ -66,7 +66,7 @@
       type="submit"
       [fullWidth]="true"
       [loading]="loading"
-      [disabled]="registerForm.invalid"
+      [disabled]="registerForm.invalid || loading"
     >
       Register
     </app-button>
